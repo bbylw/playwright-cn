@@ -316,3 +316,7 @@ Playwright 也提供 [Python](https://playwright.dev/python/docs/intro)、[.NET]
 * [贡献指南](https://github.com/microsoft/playwright/blob/main/CONTRIBUTING.md)
 * [更新日志](https://github.com/microsoft/playwright/releases)
 * [Discord](https://aka.ms/playwright/discord)
+
+---
+
+> 本文档汉化自 [microsoft/playwright](https://github.com/microsoft/playwright)
