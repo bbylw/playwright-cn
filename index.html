@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playwright — Web 自动化与测试框架</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: { DEFAULT:'#131316', light:'#1a1a1f', dark:'#0a0a0b' },
+            border: { DEFAULT:'#1e1e23', light:'#2a2a32' },
+            txt: { primary:'#e8e8ec', secondary:'#7a7a85', muted:'#4a4a55' },
+            accent: { DEFAULT:'#22c55e', dim:'#16a34a', glow:'rgba(34,197,94,0.15)' },
+            cyan: { DEFAULT:'#06b6d4', dim:'#0891b2', glow:'rgba(6,182,212,0.12)' }
+          },
+          fontFamily: {
+            display: ['"Space Grotesk"','system-ui','sans-serif'],
+            body: ['"DM Sans"','system-ui','sans-serif'],
+            mono: ['"JetBrains Mono"','"Fira Code"','monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #0a0a0b;
+      color: #e8e8ec;
+      overflow-x: hidden;
+    }
+    html { scroll-behavior: smooth; }
+
+    /* ── Noise Texture Overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0b; }
+    ::-webkit-scrollbar-thumb { background: #2a2a32; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
+
+    /* ── Typography ── */
+    h1, h2, h3, h4, h5 { font-family: 'Space Grotesk', system-ui, sans-serif; }
+
+    /* ── Reveal Animation ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      filter: blur(4px);
+      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.8s cubic-bezier(0.16,1,0.3,1),
+                  filter 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+    /* ── Stagger Children ── */
+    .stagger-children > * {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .stagger-children.visible > *:nth-child(1) { transition-delay: 0.05s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(2) { transition-delay: 0.1s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(3) { transition-delay: 0.15s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(4) { transition-delay: 0.2s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(5) { transition-delay: 0.25s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(6) { transition-delay: 0.3s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(7) { transition-delay: 0.35s; opacity:1; transform:translateY(0); }
+    .stagger-children.visible > *:nth-child(8) { transition-delay: 0.4s; opacity:1; transform:translateY(0); }
+
+    /* ── Spotlight Border ── */
+    .spotlight-card {
+      position: relative;
+      background: #131316;
+      border: 1px solid #1e1e23;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.4s;
+    }
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(34,197,94,0.12), transparent 40%);
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .spotlight-card:hover::before { opacity: 1; }
+    .spotlight-card:hover { border-color: rgba(34,197,94,0.2); }
+    .spotlight-card > * { position: relative; z-index: 1; }
+
+    /* ── Magnetic Button ── */
+    .magnetic-btn {
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: #0d0d10;
+      border: 1px solid #1e1e23;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .code-block code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* ── Tab System ── */
+    .tab-btn { transition: all 0.3s; }
+    .tab-btn.active {
+      color: #22c55e;
+      border-bottom: 2px solid #22c55e;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Kinetic Marquee ── */
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      animation: marquee 30s linear infinite;
+      width: max-content;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee {
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── Gradient Text ── */
+    .gradient-text {
+      background: linear-gradient(135deg, #22c55e 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Nav Blur ── */
+    .nav-blur {
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+    }
+
+    /* ── Grid Line Decorations ── */
+    .grid-line-h {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #1e1e23 20%, #1e1e23 80%, transparent);
+    }
+    .grid-line-v {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, #1e1e23 20%, #1e1e23 80%, transparent);
+    }
+
+    /* ── Glow ── */
+    .glow-accent {
+      box-shadow: 0 0 40px rgba(34,197,94,0.08), 0 0 80px rgba(34,197,94,0.04);
+    }
+
+    /* ── Mobile Menu ── */
+    .mobile-menu { display: none; }
+    .mobile-menu.open { display: flex; }
+
+    /* ── Reduced Motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity:1; transform:none; filter:none; transition:none; }
+      .stagger-children > * { opacity:1; transform:none; transition:none; }
+      .marquee-track { animation: none; }
+    }
+
+    /* ── Back to top ── */
+    #backToTop {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      transform: translateY(8px);
+    }
+    #backToTop.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- NAVIGATION                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <nav class="fixed top-0 w-full z-50 nav-blur bg-surface-dark/70 border-b border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center">
+          <span class="text-surface-dark font-display font-bold text-sm">P</span>
+        </div>
+        <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright</span>
+      </a>
+      <div class="hidden md:flex items-center gap-7">
+        <a href="#features" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">功能</a>
+        <a href="#quickstart" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">快速开始</a>
+        <a href="#test" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">测试</a>
+        <a href="#mcp" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">MCP</a>
+        <a href="#library" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">库</a>
+        <a href="#browsers" class="text-txt-secondary hover:text-txt-primary text-sm transition-colors">浏览器</a>
+        <a href="https://playwright.dev" target="_blank" class="magnetic-btn px-5 py-2 bg-accent hover:bg-accent-dim text-surface-dark font-semibold rounded-lg text-sm transition-colors">阅读文档</a>
+      </div>
+      <button id="menuToggle" class="md:hidden text-txt-secondary hover:text-txt-primary p-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="mobile-menu flex-col gap-1 px-5 pb-4 md:hidden bg-surface-dark/95 border-b border-border">
+      <a href="#features" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">功能</a>
+      <a href="#quickstart" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">快速开始</a>
+      <a href="#test" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">测试</a>
+      <a href="#mcp" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">MCP</a>
+      <a href="#library" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">库</a>
+      <a href="https://playwright.dev" target="_blank" class="text-accent font-semibold py-2.5 text-sm">文档 →</a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- HERO                                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="relative pt-32 pb-24 sm:pt-40 sm:pb-32 overflow-hidden">
+    <!-- Atmospheric Background -->
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-accent/5 rounded-full blur-[120px]"></div>
+      <div class="absolute top-32 left-[15%] w-[400px] h-[400px] bg-cyan/5 rounded-full blur-[100px]"></div>
+      <!-- Grid Lines -->
+      <div class="grid-line-v left-[20%] hidden lg:block"></div>
+      <div class="grid-line-v left-[80%] hidden lg:block"></div>
+      <div class="grid-line-h top-[40%]"></div>
+    </div>
+
+    <div class="relative max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="max-w-4xl">
+        <!-- Badge -->
+        <div class="reveal inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-surface/60 mb-8">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+          <span class="text-txt-muted text-xs tracking-wide uppercase">开源 · 跨浏览器 · 高可靠性</span>
+        </div>
+
+        <!-- Headline with scramble effect -->
+        <h1 class="reveal font-display font-bold tracking-tighter leading-[0.95] mb-6">
+          <span class="text-5xl sm:text-6xl lg:text-[5rem] block text-txt-primary" id="heroLine1">Web 自动化</span>
+          <span class="text-5xl sm:text-6xl lg:text-[5rem] block gradient-text" id="heroLine2">与测试框架</span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="reveal reveal-delay-1 text-lg sm:text-xl text-txt-secondary max-w-2xl leading-relaxed mb-10">
+          通过单一 API 驱动 <strong class="text-txt-primary font-medium">Chromium</strong>、<strong class="text-txt-primary font-medium">Firefox</strong> 和 <strong class="text-txt-primary font-medium">WebKit</strong>。适用于测试、脚本编写以及 AI 代理工具。
+        </p>
+
+        <!-- CTAs -->
+        <div class="reveal reveal-delay-2 flex flex-col sm:flex-row gap-3 mb-14">
+          <a href="#quickstart" class="magnetic-btn inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-accent hover:bg-accent-dim text-surface-dark font-display font-semibold rounded-xl transition-all shadow-lg shadow-accent/20 hover:shadow-accent/30">
+            开始使用
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+          <a href="https://playwright.dev" target="_blank" class="magnetic-btn inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-surface border border-border hover:border-border-light text-txt-primary font-display font-medium rounded-xl transition-all">
+            阅读文档
+          </a>
+        </div>
+
+        <!-- Version Badges -->
+        <div class="reveal reveal-delay-3 flex flex-wrap gap-2.5">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface border border-border text-xs">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            <span class="text-txt-muted">Chromium</span>
+            <span class="text-txt-secondary font-medium">147</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface border border-border text-xs">
+            <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+            <span class="text-txt-muted">Firefox</span>
+            <span class="text-txt-secondary font-medium">149</span>
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface border border-border text-xs">
+            <span class="w-2 h-2 rounded-full bg-cyan"></span>
+            <span class="text-txt-muted">WebKit</span>
+            <span class="text-txt-secondary font-medium">26.4</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MARQUEE — Browser Engine Names              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="py-6 border-y border-border/50 overflow-hidden bg-surface/30">
+    <div class="marquee-track">
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">CHROMIUM</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">FIREFOX</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">WEBKIT</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT TEST</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT MCP</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT CLI</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <!-- Duplicate for seamless loop -->
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">CHROMIUM</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">FIREFOX</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">WEBKIT</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT TEST</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT MCP</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+      <span class="font-display text-2xl sm:text-3xl font-bold text-txt-muted/30 tracking-tight whitespace-nowrap">PLAYWRIGHT CLI</span>
+      <span class="text-txt-muted/20 text-2xl">·</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FEATURES — Bento Grid                       -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="features" class="py-24 sm:py-32">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="reveal mb-16">
+        <span class="text-accent text-xs font-semibold tracking-widest uppercase">核心能力</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3">为现代 Web 构建的<br>全方位自动化</h2>
+      </div>
+
+      <!-- Bento Grid — Asymmetric -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children" id="featureGrid">
+        <!-- Card 1 — Spans 2 cols -->
+        <div class="spotlight-card p-8 md:col-span-2 lg:row-span-2 flex flex-col justify-between min-h-[320px]">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="font-display text-xl font-semibold text-txt-primary mb-3">自动等待与 Web 优先断言</h3>
+            <p class="text-txt-secondary text-sm leading-relaxed max-w-md">无需人工超时。Playwright 等待元素可操作，断言自动重试直到条件满足。专为现代异步 Web 应用设计，彻底告别 flaky test。</p>
+          </div>
+          <div class="code-block mt-6 p-4">
+            <pre><code class="text-txt-secondary"><span class="text-accent">await</span> <span class="text-cyan">expect</span>(page.getByRole(<span class="text-green-400">'button'</span>)).<span class="text-cyan">toBeEnabled</span>();</code></pre>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="spotlight-card p-7">
+          <div class="w-9 h-9 rounded-lg bg-cyan-glow border border-cyan/20 flex items-center justify-center mb-4">
+            <svg class="w-4.5 h-4.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <h3 class="font-display text-base font-semibold text-txt-primary mb-2">弹性定位器</h3>
+          <p class="text-txt-secondary text-sm leading-relaxed">角色、标签、占位符、测试 ID —— 反映用户视角，告别脆弱选择器。</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="spotlight-card p-7">
+          <div class="w-9 h-9 rounded-lg bg-accent-glow border border-accent/20 flex items-center justify-center mb-4">
+            <svg class="w-4.5 h-4.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          </div>
+          <h3 class="font-display text-base font-semibold text-txt-primary mb-2">测试隔离</h3>
+          <p class="text-txt-secondary text-sm leading-relaxed">每个测试独立浏览器上下文，等同全新配置文件。认证状态一次保存，跨测试复用。</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="spotlight-card p-7">
+          <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
+            <svg class="w-4.5 h-4.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="font-display text-base font-semibold text-txt-primary mb-2">执行追踪</h3>
+          <p class="text-txt-secondary text-sm leading-relaxed">失败时捕获追踪、截图和视频。在 Trace Viewer 中检查每一步。</p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="spotlight-card p-7">
+          <div class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-4">
+            <svg class="w-4.5 h-4.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </div>
+          <h3 class="font-display text-base font-semibold text-txt-primary mb-2">并行执行</h3>
+          <p class="text-txt-secondary text-sm leading-relaxed">所有浏览器并行运行，全新上下文几乎零开销。</p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="spotlight-card p-7">
+          <div class="w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
+            <svg class="w-4.5 h-4.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <h3 class="font-display text-base font-semibold text-txt-primary mb-2">多语言支持</h3>
+          <p class="text-txt-secondary text-sm leading-relaxed">Node.js、Python、.NET、Java —— 同一 API，跨语言一致。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- QUICK START — Bento Cards                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="quickstart" class="py-24 sm:py-32 border-t border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="reveal mb-16">
+        <span class="text-cyan text-xs font-semibold tracking-widest uppercase">快速开始</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3">选择适合你的方式</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children" id="quickstartGrid">
+        <!-- Playwright Test -->
+        <a href="#test" class="spotlight-card group p-7 flex flex-col">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-txt-primary group-hover:text-accent transition-colors">Playwright Test</h3>
+          </div>
+          <p class="text-txt-secondary text-sm mb-4 flex-1">端到端测试运行器，专为 E2E 测试构建</p>
+          <code class="text-accent text-xs font-mono bg-accent/5 border border-accent/10 px-3 py-1.5 rounded-lg self-start">npm init playwright@latest</code>
+        </a>
+
+        <!-- Playwright CLI -->
+        <a href="#cli" class="spotlight-card group p-7 flex flex-col">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-cyan-glow border border-cyan/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-txt-primary group-hover:text-cyan transition-colors">Playwright CLI</h3>
+          </div>
+          <p class="text-txt-secondary text-sm mb-4 flex-1">为编码代理设计的命令行接口</p>
+          <code class="text-cyan text-xs font-mono bg-cyan/5 border border-cyan/10 px-3 py-1.5 rounded-lg self-start">npm i -g @playwright/cli@latest</code>
+        </a>
+
+        <!-- Playwright MCP -->
+        <a href="#mcp" class="spotlight-card group p-7 flex flex-col">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-txt-primary group-hover:text-purple-400 transition-colors">Playwright MCP</h3>
+          </div>
+          <p class="text-txt-secondary text-sm mb-4 flex-1">AI 代理和 LLM 驱动的自动化</p>
+          <code class="text-purple-400 text-xs font-mono bg-purple-500/5 border border-purple-500/10 px-3 py-1.5 rounded-lg self-start">npx @playwright/mcp@latest</code>
+        </a>
+
+        <!-- Playwright Library -->
+        <a href="#library" class="spotlight-card group p-7 flex flex-col">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-txt-primary group-hover:text-orange-400 transition-colors">Playwright Library</h3>
+          </div>
+          <p class="text-txt-secondary text-sm mb-4 flex-1">浏览器自动化脚本和编程控制</p>
+          <code class="text-orange-400 text-xs font-mono bg-orange-500/5 border border-orange-500/10 px-3 py-1.5 rounded-lg self-start">npm i playwright</code>
+        </a>
+
+        <!-- VS Code Extension -->
+        <a href="https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright" target="_blank" class="spotlight-card group p-7 flex flex-col sm:col-span-2">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-txt-primary group-hover:text-blue-400 transition-colors">VS Code 扩展</h3>
+          </div>
+          <p class="text-txt-secondary text-sm">在 VS Code 中编写和调试测试。一键运行、CodeGen 录制、定位器选取、Trace Viewer 集成。</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PLAYWRIGHT TEST                             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="test" class="py-24 sm:py-32 border-t border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <!-- Left Column -->
+        <div>
+          <div class="reveal">
+            <span class="text-accent text-xs font-semibold tracking-widest uppercase">Playwright Test</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3 mb-6">功能齐全的<br>E2E 测试运行器</h2>
+            <p class="text-txt-secondary leading-relaxed mb-10">在 Chromium、Firefox 和 WebKit 上运行测试，具备完整的浏览器隔离、自动等待和 Web 优先断言。</p>
+          </div>
+
+          <div class="reveal reveal-delay-1 space-y-6">
+            <!-- Install -->
+            <div>
+              <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">安装</h3>
+              <div class="code-block p-4">
+                <pre><code class="text-txt-secondary"><span class="text-accent">$</span> npm init playwright@latest</code></pre>
+              </div>
+            </div>
+            <!-- Run -->
+            <div>
+              <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">运行测试</h3>
+              <div class="code-block p-4">
+                <pre><code class="text-txt-secondary"><span class="text-accent">$</span> npx playwright test</code></pre>
+              </div>
+              <p class="text-txt-muted text-xs mt-3 leading-relaxed">无头模式 · 全浏览器并行 · 完全隔离 · 几乎零开销</p>
+            </div>
+            <!-- Auth Reuse -->
+            <div>
+              <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">认证状态复用</h3>
+              <div class="code-block p-4">
+                <pre><code class="text-txt-secondary"><span class="text-txt-muted">// 保存登录状态</span>
+<span class="text-accent">await</span> page.context().storageState({ path: <span class="text-green-400">'auth.json'</span> });
+
+<span class="text-txt-muted">// 跨测试复用</span>
+test.use({ storageState: <span class="text-green-400">'auth.json'</span> });</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column — Code Example -->
+        <div class="reveal reveal-delay-2">
+          <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">编写测试</h3>
+          <div class="code-block p-5">
+            <pre><code class="text-txt-secondary"><span class="text-purple-400">import</span> { test, expect } <span class="text-purple-400">from</span> <span class="text-green-400">'@playwright/test'</span>;
+
+<span class="text-purple-400">test</span>(<span class="text-green-400">'has title'</span>, <span class="text-purple-400">async</span> ({ page }) => {
+  <span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+  <span class="text-purple-400">await</span> <span class="text-cyan">expect</span>(page).<span class="text-cyan">toHaveTitle</span>(<span class="text-orange-400">/Playwright/</span>);
+});
+
+<span class="text-purple-400">test</span>(<span class="text-green-400">'get started link'</span>, <span class="text-purple-400">async</span> ({ page }) => {
+  <span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+  <span class="text-purple-400">await</span> page
+    .<span class="text-cyan">getByRole</span>(<span class="text-green-400">'link'</span>, { name: <span class="text-green-400">'Get started'</span> })
+    .<span class="text-cyan">click</span>();
+  <span class="text-purple-400">await</span> <span class="text-cyan">expect</span>(
+    page.<span class="text-cyan">getByRole</span>(<span class="text-green-400">'heading'</span>, {
+      name: <span class="text-green-400">'Installation'</span>
+    })
+  ).<span class="text-cyan">toBeVisible</span>();
+});</code></pre>
+          </div>
+
+          <!-- Locators -->
+          <h3 class="font-display text-sm font-semibold text-txt-primary mt-8 mb-3 uppercase tracking-wider">弹性定位器</h3>
+          <div class="code-block p-4">
+            <pre><code class="text-txt-secondary">page.<span class="text-cyan">getByRole</span>(<span class="text-green-400">'button'</span>, { name: <span class="text-green-400">'Submit'</span> })
+page.<span class="text-cyan">getByLabel</span>(<span class="text-green-400">'Email'</span>)
+page.<span class="text-cyan">getByPlaceholder</span>(<span class="text-green-400">'Search...'</span>)
+page.<span class="text-cyan">getByTestId</span>(<span class="text-green-400">'login-form'</span>)</code></pre>
+          </div>
+
+          <!-- Trace -->
+          <h3 class="font-display text-sm font-semibold text-txt-primary mt-8 mb-3 uppercase tracking-wider">追踪配置</h3>
+          <div class="code-block p-4">
+            <pre><code class="text-txt-secondary"><span class="text-txt-muted">// playwright.config.ts</span>
+<span class="text-purple-400">export default</span> <span class="text-cyan">defineConfig</span>({
+  use: {
+    trace: <span class="text-green-400">'on-first-retry'</span>,
+  },
+});</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PLAYWRIGHT CLI                              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="cli" class="py-24 sm:py-32 border-t border-border/50 bg-surface/30">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
+        <!-- Left — 2 cols -->
+        <div class="lg:col-span-2">
+          <div class="reveal">
+            <span class="text-cyan text-xs font-semibold tracking-widest uppercase">Playwright CLI</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3 mb-6">为编码代理<br>设计的 CLI</h2>
+            <p class="text-txt-secondary leading-relaxed mb-8">比 MCP 更节省 token —— 命令避免将大型工具 schema 和可访问性树加载到模型上下文中。</p>
+          </div>
+          <div class="reveal reveal-delay-1 space-y-4">
+            <div class="code-block p-4">
+              <pre><code class="text-txt-secondary"><span class="text-cyan">$</span> npm install -g @playwright/cli@latest</code></pre>
+            </div>
+            <div class="code-block p-4">
+              <pre><code class="text-txt-secondary"><span class="text-cyan">$</span> playwright-cli install --skills</code></pre>
+            </div>
+          </div>
+        </div>
+        <!-- Right — 3 cols -->
+        <div class="lg:col-span-3">
+          <div class="reveal reveal-delay-2">
+            <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">使用示例</h3>
+            <div class="code-block p-5">
+              <pre><code class="text-txt-secondary"><span class="text-cyan">$</span> playwright-cli open https://demo.playwright.dev/todomvc/ --headed
+<span class="text-cyan">$</span> playwright-cli type <span class="text-green-400">"Buy groceries"</span>
+<span class="text-cyan">$</span> playwright-cli press Enter
+<span class="text-cyan">$</span> playwright-cli screenshot</code></pre>
+            </div>
+          </div>
+          <div class="reveal reveal-delay-3 mt-8">
+            <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">会话监控</h3>
+            <p class="text-txt-secondary text-sm mb-4">使用 <code class="text-cyan font-mono text-xs bg-cyan/5 px-1.5 py-0.5 rounded">playwright-cli show</code> 打开可视化仪表板，实时预览所有运行中的浏览器会话。</p>
+            <div class="code-block p-4">
+              <pre><code class="text-txt-secondary"><span class="text-cyan">$</span> playwright-cli show</code></pre>
+            </div>
+          </div>
+          <div class="reveal reveal-delay-4 mt-8">
+            <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">代理任务指令</h3>
+            <div class="code-block p-5 border-l-2 border-accent/30">
+              <pre><code class="text-txt-muted">使用 playwright-cli 测试
+https://demo.playwright.dev/todomvc
+上的"添加待办"流程。
+为所有成功和失败的场景截图。</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PLAYWRIGHT MCP                              -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="mcp" class="py-24 sm:py-32 border-t border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+        <!-- Left -->
+        <div>
+          <div class="reveal">
+            <span class="text-purple-400 text-xs font-semibold tracking-widest uppercase">Playwright MCP</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3 mb-6">AI 代理的<br>浏览器控制</h2>
+            <p class="text-txt-secondary leading-relaxed mb-8">通过模型上下文协议为 AI 代理提供完整的浏览器控制。代理使用结构化的可访问性快照与页面交互 —— 无需视觉模型。</p>
+          </div>
+
+          <div class="reveal reveal-delay-1">
+            <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">MCP 客户端设置</h3>
+            <div class="code-block p-5">
+              <pre><code class="text-txt-secondary">{
+  <span class="text-cyan">"mcpServers"</span>: {
+    <span class="text-cyan">"playwright"</span>: {
+      <span class="text-cyan">"command"</span>: <span class="text-green-400">"npx"</span>,
+      <span class="text-cyan">"args"</span>: [<span class="text-green-400">"@playwright/mcp@latest"</span>]
+    }
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="reveal reveal-delay-2 mt-6">
+            <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">Claude Code</h3>
+            <div class="code-block p-4">
+              <pre><code class="text-txt-secondary"><span class="text-purple-400">$</span> claude mcp add playwright npx @playwright/mcp@latest</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right — Accessibility Tree -->
+        <div class="reveal reveal-delay-3">
+          <h3 class="font-display text-sm font-semibold text-txt-primary mb-3 uppercase tracking-wider">可访问性树视图</h3>
+          <p class="text-txt-secondary text-sm mb-4">AI 代理看到的是结构化的可访问性树，使用元素引用进行确定性交互：</p>
+          <div class="code-block p-5">
+            <pre><code class="text-txt-secondary"><span class="text-txt-muted">- heading "todos" [level=1]</span>
+<span class="text-txt-muted">- textbox "What needs to be done?"</span>
+  <span class="text-cyan">[ref=e5]</span>
+<span class="text-txt-muted">- listitem:</span>
+  <span class="text-txt-muted">- checkbox "Toggle Todo"</span>
+    <span class="text-cyan">[ref=e10]</span>
+  <span class="text-txt-muted">- text: "Buy groceries"</span></code></pre>
+          </div>
+          <div class="mt-6 p-5 rounded-xl bg-surface border border-border">
+            <p class="text-txt-secondary text-sm leading-relaxed">
+              代理使用 <code class="text-cyan font-mono text-xs bg-cyan/5 px-1.5 py-0.5 rounded">e5</code>、<code class="text-cyan font-mono text-xs bg-cyan/5 px-1.5 py-0.5 rounded">e10</code> 等引用进行交互 —— <strong class="text-txt-primary">确定性强，无视觉歧义</strong>。涵盖导航、表单填写、截图、网络模拟、存储管理等。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PLAYWRIGHT LIBRARY                          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="library" class="py-24 sm:py-32 border-t border-border/50 bg-surface/30">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="reveal mb-12">
+        <span class="text-orange-400 text-xs font-semibold tracking-widest uppercase">Playwright Library</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3 mb-6">浏览器自动化脚本</h2>
+        <p class="text-txt-secondary max-w-2xl leading-relaxed">网页抓取、PDF 生成、截图捕获，以及任何需要程序化浏览器控制的工作流。</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="reveal reveal-delay-1">
+        <div class="flex gap-1 border-b border-border mb-0 overflow-x-auto" role="tablist">
+          <button class="tab-btn active px-4 py-3 text-sm font-medium text-txt-muted border-b-2 border-transparent whitespace-nowrap" data-tab="screenshot" role="tab">截图</button>
+          <button class="tab-btn px-4 py-3 text-sm font-medium text-txt-muted border-b-2 border-transparent whitespace-nowrap" data-tab="pdf" role="tab">生成 PDF</button>
+          <button class="tab-btn px-4 py-3 text-sm font-medium text-txt-muted border-b-2 border-transparent whitespace-nowrap" data-tab="mobile" role="tab">移动设备</button>
+          <button class="tab-btn px-4 py-3 text-sm font-medium text-txt-muted border-b-2 border-transparent whitespace-nowrap" data-tab="network" role="tab">网络拦截</button>
+        </div>
+
+        <div class="tab-panel active p-5 code-block rounded-t-none border-t-0" id="panel-screenshot">
+          <pre><code class="text-txt-secondary"><span class="text-purple-400">import</span> { chromium } <span class="text-purple-400">from</span> <span class="text-green-400">'playwright'</span>;
+
+<span class="text-purple-400">const</span> browser = <span class="text-purple-400">await</span> chromium.<span class="text-cyan">launch</span>();
+<span class="text-purple-400">const</span> page = <span class="text-purple-400">await</span> browser.<span class="text-cyan">newPage</span>();
+<span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+<span class="text-purple-400">await</span> page.<span class="text-cyan">screenshot</span>({ path: <span class="text-green-400">'screenshot.png'</span> });
+<span class="text-purple-400">await</span> browser.<span class="text-cyan">close</span>();</code></pre>
+        </div>
+        <div class="tab-panel p-5 code-block rounded-t-none border-t-0" id="panel-pdf">
+          <pre><code class="text-txt-secondary"><span class="text-purple-400">import</span> { chromium } <span class="text-purple-400">from</span> <span class="text-green-400">'playwright'</span>;
+
+<span class="text-purple-400">const</span> browser = <span class="text-purple-400">await</span> chromium.<span class="text-cyan">launch</span>();
+<span class="text-purple-400">const</span> page = <span class="text-purple-400">await</span> browser.<span class="text-cyan">newPage</span>();
+<span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+<span class="text-purple-400">await</span> page.<span class="text-cyan">pdf</span>({ path: <span class="text-green-400">'page.pdf'</span>, format: <span class="text-green-400">'A4'</span> });
+<span class="text-purple-400">await</span> browser.<span class="text-cyan">close</span>();</code></pre>
+        </div>
+        <div class="tab-panel p-5 code-block rounded-t-none border-t-0" id="panel-mobile">
+          <pre><code class="text-txt-secondary"><span class="text-purple-400">import</span> { chromium, devices } <span class="text-purple-400">from</span> <span class="text-green-400">'playwright'</span>;
+
+<span class="text-purple-400">const</span> browser = <span class="text-purple-400">await</span> chromium.<span class="text-cyan">launch</span>();
+<span class="text-purple-400">const</span> context = <span class="text-purple-400">await</span> browser.<span class="text-cyan">newContext</span>(
+  devices[<span class="text-green-400">'iPhone 15'</span>]
+);
+<span class="text-purple-400">const</span> page = <span class="text-purple-400">await</span> context.<span class="text-cyan">newPage</span>();
+<span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+<span class="text-purple-400">await</span> page.<span class="text-cyan">screenshot</span>({ path: <span class="text-green-400">'mobile.png'</span> });
+<span class="text-purple-400">await</span> browser.<span class="text-cyan">close</span>();</code></pre>
+        </div>
+        <div class="tab-panel p-5 code-block rounded-t-none border-t-0" id="panel-network">
+          <pre><code class="text-txt-secondary"><span class="text-purple-400">import</span> { chromium } <span class="text-purple-400">from</span> <span class="text-green-400">'playwright'</span>;
+
+<span class="text-purple-400">const</span> browser = <span class="text-purple-400">await</span> chromium.<span class="text-cyan">launch</span>();
+<span class="text-purple-400">const</span> page = <span class="text-purple-400">await</span> browser.<span class="text-cyan">newPage</span>();
+<span class="text-purple-400">await</span> page.<span class="text-cyan">route</span>(<span class="text-green-400">'**/*.{png,jpg,jpeg}'</span>,
+  route => route.<span class="text-cyan">abort</span>()
+);
+<span class="text-purple-400">await</span> page.<span class="text-cyan">goto</span>(<span class="text-green-400">'https://playwright.dev/'</span>);
+<span class="text-purple-400">await</span> browser.<span class="text-cyan">close</span>();</code></pre>
+        </div>
+      </div>
+
+      <!-- Install -->
+      <div class="reveal reveal-delay-2 mt-6">
+        <div class="code-block p-4 inline-block">
+          <pre><code class="text-txt-secondary"><span class="text-orange-400">$</span> npm i playwright</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BROWSER SUPPORT                             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="browsers" class="py-24 sm:py-32 border-t border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="reveal text-center mb-16">
+        <span class="text-txt-muted text-xs font-semibold tracking-widest uppercase">跨浏览器</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3">全面的浏览器支持</h2>
+        <p class="text-txt-secondary mt-3">所有平台支持无头和有头模式</p>
+      </div>
+
+      <div class="reveal reveal-delay-1 max-w-2xl mx-auto">
+        <div class="rounded-2xl border border-border overflow-hidden">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-surface">
+                <th class="px-6 py-4 text-left text-xs font-semibold text-txt-muted uppercase tracking-wider"></th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-txt-muted uppercase tracking-wider">Linux</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-txt-muted uppercase tracking-wider">macOS</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-txt-muted uppercase tracking-wider">Windows</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+              <tr>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    <span class="text-sm font-medium text-txt-primary">Chromium 147</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan"></span>
+                    <span class="text-sm font-medium text-txt-primary">WebKit 26.4</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+              </tr>
+              <tr>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                    <span class="text-sm font-medium text-txt-primary">Firefox 149</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+                <td class="px-6 py-4 text-center text-accent">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-txt-muted text-xs mt-4 text-center">默认使用 Chrome for Testing</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- RESOURCES & COMMUNITY                       -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section class="py-24 sm:py-32 border-t border-border/50 bg-surface/30">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
+      <div class="reveal text-center mb-16">
+        <span class="text-txt-muted text-xs font-semibold tracking-widest uppercase">资源</span>
+        <h2 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mt-3">文档与社区</h2>
+      </div>
+
+      <div class="reveal reveal-delay-1 grid grid-cols-2 md:grid-cols-4 gap-3 stagger-children" id="resourceGrid">
+        <a href="https://playwright.dev" target="_blank" class="spotlight-card group p-5 text-center">
+          <svg class="w-5 h-5 text-accent mx-auto mb-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <p class="text-sm font-medium text-txt-primary group-hover:text-accent transition-colors">文档</p>
+        </a>
+        <a href="https://playwright.dev/docs/api/class-playwright" target="_blank" class="spotlight-card group p-5 text-center">
+          <svg class="w-5 h-5 text-cyan mx-auto mb-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          <p class="text-sm font-medium text-txt-primary group-hover:text-cyan transition-colors">API 参考</p>
+        </a>
+        <a href="https://github.com/microsoft/playwright-mcp" target="_blank" class="spotlight-card group p-5 text-center">
+          <svg class="w-5 h-5 text-purple-400 mx-auto mb-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <p class="text-sm font-medium text-txt-primary group-hover:text-purple-400 transition-colors">MCP 服务器</p>
+        </a>
+        <a href="https://aka.ms/playwright/discord" target="_blank" class="spotlight-card group p-5 text-center">
+          <svg class="w-5 h-5 text-indigo-400 mx-auto mb-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+          <p class="text-sm font-medium text-txt-primary group-hover:text-indigo-400 transition-colors">Discord</p>
+        </a>
+      </div>
+
+      <div class="reveal reveal-delay-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-10">
+        <a href="https://github.com/microsoft/playwright-cli" target="_blank" class="text-txt-muted hover:text-txt-primary text-sm transition-colors">编码代理 CLI</a>
+        <a href="https://github.com/microsoft/playwright-vscode" target="_blank" class="text-txt-muted hover:text-txt-primary text-sm transition-colors">VS Code 扩展</a>
+        <a href="https://github.com/microsoft/playwright/blob/main/CONTRIBUTING.md" target="_blank" class="text-txt-muted hover:text-txt-primary text-sm transition-colors">贡献指南</a>
+        <a href="https://github.com/microsoft/playwright/releases" target="_blank" class="text-txt-muted hover:text-txt-primary text-sm transition-colors">更新日志</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FOOTER                                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <footer class="py-10 border-t border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-accent to-cyan flex items-center justify-center">
+          <span class="text-surface-dark font-display font-bold text-[10px]">P</span>
+        </div>
+        <span class="font-display font-semibold text-sm text-txt-secondary">Playwright</span>
+      </div>
+      <p class="text-txt-muted text-xs">
+        由 <a href="https://github.com/microsoft" target="_blank" class="text-txt-secondary hover:text-txt-primary transition-colors">Microsoft</a> 开源 · Apache 2.0
+      </p>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button id="backToTop" class="fixed bottom-8 right-8 w-10 h-10 rounded-xl bg-surface border border-border text-txt-muted hover:text-txt-primary hover:border-accent/30 transition-all flex items-center justify-center z-40" title="回到顶部">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 15l7-7 7 7"/></svg>
+  </button>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- JAVASCRIPT                                  -->
+  <!-- ═══════════════════════════════════════════ -->
+  <script>
+    // ── Mobile Menu ──
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+    // ── Scroll Reveal (IntersectionObserver) ──
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '-40px' });
+
+    document.querySelectorAll('.reveal, .stagger-children').forEach(el => revealObserver.observe(el));
+
+    // ── Spotlight Border (mouse tracking) ──
+    document.querySelectorAll('.spotlight-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+        card.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+      });
+    });
+
+    // ── Magnetic Button ──
+    document.querySelectorAll('.magnetic-btn').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        btn.style.transform = `translate(${dx * 0.15}px, ${dy * 0.15}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+      });
+    });
+
+    // ── Tab System ──
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.dataset.tab;
+        // Deactivate all
+        btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.closest('.reveal, section').querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        // Activate
+        btn.classList.add('active');
+        document.getElementById('panel-' + tabId).classList.add('active');
+      });
+    });
+
+    // ── Back to Top ──
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      backToTop.classList.toggle('show', window.scrollY > 500);
+    });
+    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // ── Text Scramble on Hero (subtle, on load) ──
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    function scramble(el, finalText, duration) {
+      const iterations = Math.ceil(duration / 30);
+      let current = 0;
+      const id = setInterval(() => {
+        el.textContent = finalText.split('').map((ch, i) => {
+          if (i < current) return ch;
+          if (ch === ' ') return ' ';
+          return chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+        current += finalText.length / iterations;
+        if (current >= finalText.length) {
+          el.textContent = finalText;
+          clearInterval(id);
+        }
+      }, 30);
+    }
+
+    // Run scramble on hero lines after a short delay
+    setTimeout(() => {
+      const line1 = document.getElementById('heroLine1');
+      const line2 = document.getElementById('heroLine2');
+      if (line1) scramble(line1, 'Web 自动化', 600);
+      setTimeout(() => {
+        if (line2) scramble(line2, '与测试框架', 600);
+      }, 300);
+    }, 200);
+  </script>
+</body>
+</html>
