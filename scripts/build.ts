@@ -1,9 +1,9 @@
 /**
  * Nimbus + Bun 静态构建
- * 输出到仓库根目录（GitHub Pages 直接可服务）：
- *   index.html · docs/<slug>/index.html · 404.html · assets/*
+ * 输出到 dist/（GitHub Actions 上传为 Pages artifact）：
+ *   index.html · docs/<slug>/index.html · 404.html · assets/* · CNAME
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderDocument, html } from "../nimbus/core.ts";
 import { shell } from "../nimbus/layout.ts";
@@ -12,17 +12,19 @@ import { landingPage } from "../src/pages/landing.ts";
 import { loadDocs } from "../src/pages/docs.ts";
 
 const ROOT = join(import.meta.dir, "..");
+const OUT = join(ROOT, "dist");
 const t0 = performance.now();
 
 function write(rel: string, content: string): void {
-  const path = join(ROOT, rel);
+  const path = join(OUT, rel);
   mkdirSync(join(path, ".."), { recursive: true });
   writeFileSync(path, content);
 }
 
 /* 1. Tailwind v4 本地编译（替代 CDN 运行时） */
+mkdirSync(join(OUT, "assets"), { recursive: true });
 const tw = Bun.spawnSync(
-  [process.execPath, "x", "@tailwindcss/cli", "-i", "src/styles/app.css", "-o", "assets/app.css", "--minify"],
+  [process.execPath, "x", "@tailwindcss/cli", "-i", "src/styles/app.css", "-o", "dist/assets/app.css", "--minify"],
   { cwd: ROOT, stdout: "pipe", stderr: "pipe" }
 );
 if (tw.exitCode !== 0) {
@@ -33,7 +35,7 @@ if (tw.exitCode !== 0) {
 /* 2. 客户端脚本打包 */
 const bundle = await Bun.build({
   entrypoints: [join(ROOT, "src/client/main.ts"), join(ROOT, "src/client/docs.ts")],
-  outdir: join(ROOT, "assets"),
+  outdir: join(OUT, "assets"),
   target: "browser",
   minify: true,
   naming: "[name].js",
@@ -119,5 +121,8 @@ write(
   )
 );
 
+/* 6. 自定义域名（GitHub Pages artifact 需包含 CNAME） */
+copyFileSync(join(ROOT, "CNAME"), join(OUT, "CNAME"));
+
 const ms = Math.round(performance.now() - t0);
-console.log(`✔ 构建完成：1 落地页 + ${docs.length} 文档页 + 404 + 搜索索引（${ms}ms）`);
+console.log(`✔ 构建完成：1 落地页 + ${docs.length} 文档页 + 404 + 搜索索引 → dist/（${ms}ms）`);

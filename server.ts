@@ -1,12 +1,13 @@
 /**
- * Bun 开发 / 预览服务器
+ * Bun 开发 / 预览服务器（服务 dist/ 构建产物）
  *   bun run server.ts --dev   构建 + 监听源码自动重建
- *   bun run server.ts         仅静态服务已构建产物
+ *   bun run server.ts         静态服务 dist/（缺失时自动构建一次）
  */
 import { watch } from "node:fs";
 import { join, normalize } from "node:path";
 
 const ROOT = import.meta.dir;
+const SITE = join(ROOT, "dist");
 const PORT = Number(process.env.PORT ?? 3000);
 const DEV = process.argv.includes("--dev");
 
@@ -44,6 +45,8 @@ if (DEV) {
     });
   }
   console.log(`✔ 开发模式：监听 src/ nimbus/ content/ scripts/`);
+} else if (!(await Bun.file(join(SITE, "index.html")).exists())) {
+  if (!runBuild()) console.error("构建失败，请先运行 bun run build 修复问题。");
 }
 
 const server = Bun.serve({
@@ -65,8 +68,8 @@ const server = Bun.serve({
       candidates.push(`${pathname}/index.html`, `${pathname}.html`);
     }
     for (const candidate of candidates) {
-      const path = normalize(join(ROOT, candidate));
-      if (!path.startsWith(ROOT)) continue;
+      const path = normalize(join(SITE, candidate));
+      if (!path.startsWith(SITE)) continue;
       const file = Bun.file(path);
       if (await file.exists()) {
         return new Response(file, {
@@ -74,7 +77,7 @@ const server = Bun.serve({
         });
       }
     }
-    const notFound = Bun.file(join(ROOT, "404.html"));
+    const notFound = Bun.file(join(SITE, "404.html"));
     if (await notFound.exists()) {
       return new Response(notFound, { status: 404, headers: { "Content-Type": "text/html; charset=utf-8" } });
     }

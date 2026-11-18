@@ -8,13 +8,14 @@ Playwright 是一个用于 Web 自动化和测试的框架。它通过单一 API
 
 ## 本站开发（Nimbus + Bun）
 
-本仓库是 Playwright 中文落地页与文档站（[playwright.ndjp.net](https://playwright.ndjp.net)），技术栈为 **Nimbus**（仓库内置的轻量 HTML 组件 / Markdown 渲染层，见 `nimbus/`）+ **Bun** + Tailwind CSS v4 本地编译，构建产物直接输出到仓库根目录供 GitHub Pages 服务。
+本仓库是 Playwright 中文落地页与文档站（[playwright.ndjp.net](https://playwright.ndjp.net)），技术栈为 **Nimbus**（仓库内置的轻量 HTML 组件 / Markdown 渲染层，见 `nimbus/`）+ **Bun** + Tailwind CSS v4 本地编译。构建产物输出到 `dist/`（不入库），推送到 `main` 后由 GitHub Actions（`.github/workflows/deploy.yml`）自动构建并发布到 GitHub Pages。
 
 ```bash
 bun install        # 安装依赖
 bun run dev        # 开发服务器（http://localhost:3000，监听源码自动重建）
-bun run build      # 静态构建：index.html + docs/* + assets/*
-bun run preview    # 仅服务已构建产物
+bun run build      # 静态构建 → dist/（index.html + docs/* + assets/* + CNAME）
+bun run preview    # 服务 dist/（缺失时自动构建一次）
+bun run typecheck  # TypeScript 类型检查
 ```
 
 - 落地页组件：`src/pages/landing.ts`；客户端交互：`src/client/`
