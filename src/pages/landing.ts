@@ -510,7 +510,7 @@ function docsBand(): Html {
 
 export function landingPage(): Html {
   return html`
-  <main>
+  <main id="main">
     ${hero()}
     ${marquee()}
     ${features()}

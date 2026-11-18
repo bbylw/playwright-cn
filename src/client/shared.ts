@@ -19,22 +19,40 @@ export function initNav(): void {
 
   const menuBtn = document.getElementById("menuBtn");
   const mobileMenu = document.getElementById("mobileMenu");
-  menuBtn?.addEventListener("click", () => {
-    const open = mobileMenu?.classList.toggle("open") ?? false;
-    menuBtn.setAttribute("aria-expanded", String(open));
-  });
-  mobileMenu?.querySelectorAll("a").forEach((a) =>
-    a.addEventListener("click", () => {
-      mobileMenu.classList.remove("open");
-      menuBtn?.setAttribute("aria-expanded", "false");
-    })
-  );
+  if (menuBtn && mobileMenu) {
+    if ("popover" in HTMLElement.prototype) {
+      // 原生 Popover：开合、light-dismiss、Esc 均由浏览器处理
+      mobileMenu.addEventListener("toggle", (e) => {
+        menuBtn.setAttribute("aria-expanded", String((e as ToggleEvent).newState === "open"));
+      });
+      mobileMenu.querySelectorAll("a").forEach((a) =>
+        a.addEventListener("click", () => mobileMenu.hidePopover())
+      );
+    } else {
+      // 旧浏览器回退：class 切换
+      menuBtn.addEventListener("click", () => {
+        const open = mobileMenu.classList.toggle("open");
+        menuBtn.setAttribute("aria-expanded", String(open));
+      });
+      mobileMenu.querySelectorAll("a").forEach((a) =>
+        a.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+          menuBtn.setAttribute("aria-expanded", "false");
+        })
+      );
+    }
+  }
 }
 
 export function initReveal(): void {
   const targets = Array.from(document.querySelectorAll<HTMLElement>(".reveal, .stagger-children"));
   if (prefersReducedMotion) {
     targets.forEach((el) => el.classList.add("visible"));
+    return;
+  }
+  // 支持滚动驱动动画时交给合成器线程（CSS animation-timeline: view()）
+  if (CSS.supports("(animation-timeline: view()) and (animation-range: entry)")) {
+    document.documentElement.classList.add("sda");
     return;
   }
   // 滚动位置检查（rAF 节流）：进入视口或已被跳过的元素都显示，

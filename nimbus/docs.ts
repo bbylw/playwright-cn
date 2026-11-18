@@ -87,22 +87,25 @@ function pager(data: DocsData, current: DocMeta): Html {
 
 function searchModal(): Html {
   return html`
-  <div id="searchModal" class="search-modal" role="dialog" aria-modal="true" aria-label="搜索文档" hidden>
+  <dialog id="searchModal" class="search-modal" closedby="any" aria-label="搜索文档">
     <div class="search-panel">
-      <div class="flex items-center gap-3 px-4 border-b border-border">
-        <svg class="w-4 h-4 text-txt-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input id="searchInput" type="search" placeholder="搜索文档、API、命令…" class="w-full bg-transparent py-3.5 text-sm text-txt-primary placeholder:text-txt-muted outline-none" autocomplete="off" spellcheck="false">
-        <kbd class="kbd shrink-0">Esc</kbd>
-      </div>
-      <ul id="searchResults" class="search-results" role="listbox"></ul>
+      <search class="flex items-center gap-3 px-4 border-b border-border">
+        <svg class="w-4 h-4 text-txt-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input id="searchInput" type="search" placeholder="搜索文档、API、命令…" class="w-full bg-transparent py-3.5 text-sm text-txt-primary placeholder:text-txt-muted outline-none" autocomplete="off" spellcheck="false" aria-label="搜索文档" autofocus>
+        <button type="button" id="searchClose" class="w-7 h-7 shrink-0 flex items-center justify-center rounded-md text-txt-muted hover:text-txt-primary hover:bg-surface-light transition-colors" aria-label="关闭搜索">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </search>
+      <ul id="searchResults" class="search-results" role="listbox" aria-label="搜索结果"></ul>
       <div id="searchEmpty" class="px-4 py-8 text-center text-txt-muted text-sm">输入关键词开始搜索，例如「定位器」「storageState」「shard」</div>
       <div class="flex items-center gap-4 px-4 py-2.5 border-t border-border text-txt-muted text-xs">
         <span><kbd class="kbd">↑</kbd> <kbd class="kbd">↓</kbd> 导航</span>
         <span><kbd class="kbd">Enter</kbd> 打开</span>
+        <span><kbd class="kbd">Esc</kbd> 关闭</span>
         <span class="ml-auto" id="searchCount"></span>
       </div>
     </div>
-  </div>`;
+  </dialog>`;
 }
 
 export function docsLayout(doc: RenderedDoc, data: DocsData): Html {
@@ -110,7 +113,7 @@ export function docsLayout(doc: RenderedDoc, data: DocsData): Html {
   return html`
   <div class="docs-shell max-w-[1400px] mx-auto px-5 sm:px-8 pt-16">
     ${sidebar(data, meta)}
-    <main class="docs-main min-w-0">
+    <main id="main" class="docs-main min-w-0">
       <button type="button" id="sidebarToggle" class="lg:hidden inline-flex items-center gap-2 mt-6 mb-2 px-3 py-1.5 rounded-lg bg-surface border border-border text-txt-secondary text-sm hover:border-border-light transition-colors" aria-expanded="false" aria-controls="docsSidebar">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6h16M4 12h10M4 18h16"/></svg>
         文档目录

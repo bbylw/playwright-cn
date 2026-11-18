@@ -21,7 +21,7 @@ const ghIcon = html`<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"
 
 function nav(active: "home" | "docs"): Html {
   const link = (href: string, label: string, isActive = false): Html =>
-    html`<a href="${href}" class="nav-link ${isActive ? "nav-link-active" : ""}">${label}</a>`;
+    html`<a href="${href}" class="nav-link ${isActive ? "nav-link-active" : ""}" ${isActive ? raw('aria-current="page"') : null}>${label}</a>`;
   return html`
   <nav id="siteNav" class="fixed top-0 w-full z-50 nav-blur bg-surface-dark/70 border-b border-border/50">
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
@@ -47,12 +47,12 @@ function nav(active: "home" | "docs"): Html {
         </button>` : html`
         <a href="/docs/installation" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-accent hover:bg-accent-dim text-surface-dark text-sm font-display font-semibold transition-colors shadow-md shadow-accent/20">开始使用</a>`}
         <a href="https://github.com/microsoft/playwright" target="_blank" rel="noopener noreferrer" class="w-9 h-9 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-transparent hover:border-border transition-colors" aria-label="GitHub 仓库">${ghIcon}</a>
-        <button type="button" id="menuBtn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-border transition-colors" aria-label="打开菜单" aria-expanded="false">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <button type="button" id="menuBtn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-border transition-colors" aria-label="打开菜单" aria-expanded="false" popovertarget="mobileMenu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
       </div>
     </div>
-    <div id="mobileMenu" class="mobile-menu flex-col gap-1 px-5 pb-4 md:hidden bg-surface-dark/95 border-b border-border">
+    <div id="mobileMenu" class="mobile-menu flex-col gap-1 md:hidden" popover="auto">
       <a href="/#features" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">功能</a>
       <a href="/#quickstart" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">快速开始</a>
       <a href="/docs/intro" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">文档</a>
@@ -101,6 +101,7 @@ function footer(): Html {
 }
 
 export function shell(opts: ShellOpts): Html {
+  const canonical = `https://playwright.ndjp.net${opts.path}`;
   return html`<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -108,18 +109,33 @@ export function shell(opts: ShellOpts): Html {
   <title>${opts.title}</title>
   <meta name="description" content="${opts.description}">
   <meta name="theme-color" content="#0a0d0b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="${canonical}">
   <meta property="og:title" content="${opts.title}">
   <meta property="og:description" content="${opts.description}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="${canonical}">
+  <meta property="og:locale" content="zh_CN">
+  <meta name="twitter:card" content="summary">
   <link rel="icon" href="${favicon}">
+  <link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap"></noscript>
   <link rel="stylesheet" href="/assets/app.css">
   <script>document.documentElement.classList.add('js');</script>
   <script defer src="${opts.script}"></script>
+  <script type="speculationrules">
+  {
+    "prefetch": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }],
+    "prerender": [{ "where": { "and": [{ "href_matches": "/*" }, { "not": { "selector_matches": "[rel~=nofollow]" } }] }, "eagerness": "conservative" }]
+  }
+  </script>
 </head>
 <body class="antialiased ${opts.bodyClass ?? ""}" data-page="${opts.active}" data-path="${opts.path}">
+  <a href="#main" class="skip-link">跳到主要内容</a>
   <div class="aurora-bg" aria-hidden="true">
     <div class="aurora aurora-1"></div>
     <div class="aurora aurora-2"></div>

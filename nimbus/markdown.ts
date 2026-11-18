@@ -117,7 +117,7 @@ export function renderMarkdown(source: string): RenderedDoc {
         return (
           `<div class="code-block group/code"><div class="code-head">` +
           `<span class="code-lang">${escapeHtml(label)}</span>${COPY_BTN}</div>` +
-          `<pre><code>${body}</code></pre></div>\n`
+          `<pre role="region" aria-label="${escapeHtml(label)} 代码" tabindex="0"><code>${body}</code></pre></div>\n`
         );
       },
       blockquote({ tokens }): string {

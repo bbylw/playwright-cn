@@ -27,7 +27,7 @@ export function codeBlock(code: string, lang: string, opts: CodeBlockOpts = {}):
         <span class="code-lang">${label}</span>
         ${copyButton()}
       </div>
-      <pre><code>${raw(highlight(trimmed, lang))}</code></pre>
+      <pre role="region" aria-label="${label} 代码" tabindex="0"><code>${raw(highlight(trimmed, lang))}</code></pre>
     </div>`;
 }
 
@@ -35,7 +35,7 @@ export function codeBlock(code: string, lang: string, opts: CodeBlockOpts = {}):
 export function commandBlock(command: string, accent = "text-accent"): Html {
   return html`
     <div class="code-block code-cmd group/code ${accent}">
-      <pre><code><span class="cmd-prompt">$</span> ${raw(highlight(command, "bash"))}</code></pre>
+      <pre role="region" aria-label="终端命令" tabindex="0"><code><span class="cmd-prompt">$</span> ${raw(highlight(command, "bash"))}</code></pre>
       ${copyButton("copy-float")}
     </div>`;
 }
@@ -46,7 +46,7 @@ export function pmCommand(cmds: { bun: string; npm: string; pnpm: string; yarn: 
     html`<span class="pm-variant ${pm === "bun" ? "pm-active" : ""}" data-pm-variant="${pm}">${raw(highlight(cmds[pm], "bash"))}</span>`;
   return html`
     <div class="code-block code-cmd group/code">
-      <pre><code><span class="cmd-prompt">$</span> ${variant("bun")}${variant("npm")}${variant("pnpm")}${variant("yarn")}</code></pre>
+      <pre role="region" aria-label="终端命令" tabindex="0"><code><span class="cmd-prompt">$</span> ${variant("bun")}${variant("npm")}${variant("pnpm")}${variant("yarn")}</code></pre>
       ${copyButton("copy-float")}
     </div>`;
 }

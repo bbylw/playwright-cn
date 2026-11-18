@@ -24,18 +24,53 @@
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 }
 
+/* ── 自托管字体（latin 子集，可变字重）───────────────── */
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/dm-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ── 基础 ─────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+}
 html {
   scroll-behavior: smooth;
 }
 body {
   font-family: var(--font-sans);
+  font-size-adjust: from-font;
   background: var(--color-surface-dark);
   color: var(--color-txt-primary);
   overflow-x: hidden;
 }
 h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
+  font-size-adjust: from-font;
+  text-wrap: balance;
+}
+p, li {
+  text-wrap: pretty;
 }
 ::selection {
   background: rgba(47, 212, 101, 0.28);
@@ -45,6 +80,37 @@ h1, h2, h3, h4, h5 {
   outline: 2px solid rgba(47, 212, 101, 0.6);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* 跳转链接（键盘可达） */
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.6rem 1.1rem;
+  border-radius: 10px;
+  background: var(--color-accent);
+  color: var(--color-surface-dark);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: top 0.2s;
+}
+.skip-link:focus-visible {
+  top: 0.75rem;
+}
+
+/* 跨文档视图过渡（渐进增强） */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+}
+#siteNav {
+  view-transition-name: site-nav;
 }
 
 /* 噪点覆层 */
@@ -124,9 +190,31 @@ body[data-page="docs"] .aurora { opacity: 0.45; }
 .nav-link-active { color: var(--color-accent); font-weight: 500; }
 .mobile-menu { display: none; }
 .mobile-menu.open { display: flex; }
+/* Popover API（原生 light-dismiss / Esc / 顶层渲染） */
+#mobileMenu[popover] {
+  position: fixed;
+  inset: 4rem 0 auto 0;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: #0a0d0b;
+  padding: 0.5rem 1.25rem 1rem;
+}
+#mobileMenu[popover]:popover-open {
+  display: flex;
+  animation: menu-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-8px); }
+}
+#mobileMenu[popover]::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
 
 /* ── 入场动画 ─────────────────────────────────────── */
-html.js .reveal {
+html.js:not(.sda) .reveal {
   opacity: 0;
   transform: translateY(32px);
   filter: blur(4px);
@@ -134,20 +222,20 @@ html.js .reveal {
               transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
               filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
-html.js .reveal.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+html.js:not(.sda) .reveal.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
 .reveal-delay-5 { transition-delay: 0.5s; }
 
-html.js .stagger-children > * {
+html.js:not(.sda) .stagger-children > * {
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-html.js .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
+html.js:not(.sda) .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
 .stagger-children.visible > *:nth-child(1) { transition-delay: 0.05s; }
 .stagger-children.visible > *:nth-child(2) { transition-delay: 0.1s; }
 .stagger-children.visible > *:nth-child(3) { transition-delay: 0.15s; }
@@ -156,6 +244,33 @@ html.js .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
 .stagger-children.visible > *:nth-child(6) { transition-delay: 0.3s; }
 .stagger-children.visible > *:nth-child(7) { transition-delay: 0.35s; }
 .stagger-children.visible > *:nth-child(8) { transition-delay: 0.4s; }
+
+/* 原生滚动驱动动画（合成器线程，替代 JS 滚动监听；不支持时回退到上方 JS 路径） */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes reveal-in {
+      from { opacity: 0; transform: translateY(32px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    html.js.sda .reveal {
+      animation: reveal-in auto linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+    html.js.sda .stagger-children > * {
+      animation: reveal-in auto linear both;
+      animation-timeline: view();
+      animation-range: entry var(--sd-start, 0%) entry 100%;
+    }
+    html.js.sda .stagger-children > *:nth-child(2) { --sd-start: 4%; }
+    html.js.sda .stagger-children > *:nth-child(3) { --sd-start: 8%; }
+    html.js.sda .stagger-children > *:nth-child(4) { --sd-start: 12%; }
+    html.js.sda .stagger-children > *:nth-child(5) { --sd-start: 16%; }
+    html.js.sda .stagger-children > *:nth-child(6) { --sd-start: 20%; }
+    html.js.sda .stagger-children > *:nth-child(7) { --sd-start: 24%; }
+    html.js.sda .stagger-children > *:nth-child(8) { --sd-start: 28%; }
+  }
+}
 
 /* ── 卡片与按钮 ───────────────────────────────────── */
 .spotlight-card {
@@ -695,19 +810,46 @@ html.js .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
 }
 .callout-warning .callout-title { color: #fbbf24; }
 
-/* ── 搜索弹层 ─────────────────────────────────────── */
-.search-modal {
+/* ── 搜索弹层（原生 <dialog>：焦点圈定、Esc、closedby 光-dismiss） ── */
+dialog.search-modal {
   position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 12vh 1rem 1rem;
+  inset: 12vh 0 auto 0;
+  margin: 0 auto;
+  width: min(36rem, calc(100% - 2rem));
+  max-width: none;
+  max-height: calc(100vh - 14vh);
+  border: none;
+  padding: 0;
+  background: transparent;
+  opacity: 1;
+  transition: opacity 0.18s ease, display 0.18s allow-discrete;
+}
+dialog.search-modal[open] {
+  display: block;
+}
+dialog.search-modal:not([open]) {
+  opacity: 0;
+}
+@starting-style {
+  dialog.search-modal[open] { opacity: 0; }
+}
+dialog.search-modal:modal {
+  overscroll-behavior: contain;
+}
+dialog.search-modal::backdrop {
   background: rgba(4, 6, 5, 0.72);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overscroll-behavior: contain;
+  opacity: 1;
+  transition: opacity 0.18s ease, display 0.18s allow-discrete;
 }
-.search-modal[hidden] { display: none; }
+dialog.search-modal:not([open])::backdrop {
+  opacity: 0;
+}
+@starting-style {
+  dialog.search-modal[open]::backdrop { opacity: 0; }
+}
 .search-panel {
   width: 100%;
   max-width: 36rem;
@@ -716,6 +858,8 @@ html.js .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
   border-radius: 16px;
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+}
+dialog.search-modal[open] .search-panel {
   animation: search-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes search-in {
@@ -783,13 +927,16 @@ html.js .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
 /* ── 减少动态效果 ─────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  @view-transition { navigation: none; }
   .reveal, html.js .stagger-children > * {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
     transition: none !important;
+    animation: none !important;
   }
   .marquee-track, .aurora, .term-caret { animation: none !important; }
   .term-pending .term-line { opacity: 1; transform: none; }
-  .tab-panel.active, .search-panel { animation: none; }
+  .tab-panel.active, .search-panel, #mobileMenu[popover]:popover-open { animation: none; }
+  dialog.search-modal, dialog.search-modal::backdrop { transition: none; }
 }

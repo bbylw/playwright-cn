@@ -3,7 +3,7 @@
  * 输出到 dist/（GitHub Actions 上传为 Pages artifact）：
  *   index.html · docs/<slug>/index.html · 404.html · assets/* · CNAME
  */
-import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderDocument, html } from "../nimbus/core.ts";
 import { shell } from "../nimbus/layout.ts";
@@ -121,7 +121,8 @@ write(
   )
 );
 
-/* 6. 自定义域名（GitHub Pages artifact 需包含 CNAME） */
+/* 6. 静态资源（自托管字体）与自定义域名（Pages artifact 需包含 CNAME） */
+cpSync(join(ROOT, "public"), OUT, { recursive: true });
 copyFileSync(join(ROOT, "CNAME"), join(OUT, "CNAME"));
 
 const ms = Math.round(performance.now() - t0);

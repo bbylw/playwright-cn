@@ -108,7 +108,7 @@ function search(index: SearchEntry[], query: string): Hit[] {
 }
 
 function initSearch(): void {
-  const modal = document.getElementById("searchModal");
+  const modal = document.getElementById("searchModal") as HTMLDialogElement | null;
   const input = document.getElementById("searchInput") as HTMLInputElement | null;
   const resultsEl = document.getElementById("searchResults");
   const emptyEl = document.getElementById("searchEmpty");
@@ -119,7 +119,6 @@ function initSearch(): void {
   let loading: Promise<void> | null = null;
   let hits: Hit[] = [];
   let active = 0;
-  let lastFocus: HTMLElement | null = null;
 
   const loadIndex = () => {
     loading ??= fetch("/assets/search-index.json")
@@ -190,25 +189,30 @@ function initSearch(): void {
   };
 
   const open = () => {
-    lastFocus = document.activeElement as HTMLElement;
-    modal.hidden = false;
-    document.body.style.overflow = "hidden";
+    if (modal.open) return;
+    modal.showModal();
     input.value = "";
     render();
     input.focus();
     void loadIndex();
   };
   const close = () => {
-    modal.hidden = true;
-    document.body.style.overflow = "";
-    lastFocus?.focus();
+    if (modal.open) modal.close();
   };
 
   document.getElementById("searchTrigger")?.addEventListener("click", open);
   document.getElementById("searchTriggerMobile")?.addEventListener("click", open);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) close();
-  });
+  document.getElementById("searchClose")?.addEventListener("click", close);
+  // closedby="any" 的轻量回退（Safari 等）：按下与抬起都在面板外才关闭
+  if (!("closedBy" in HTMLDialogElement.prototype)) {
+    const outside = (e: PointerEvent) => {
+      const r = modal.getBoundingClientRect();
+      return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    };
+    let pressedOutside = false;
+    modal.addEventListener("pointerdown", (e) => { pressedOutside = outside(e); });
+    modal.addEventListener("pointerup", (e) => { if (pressedOutside && outside(e)) close(); });
+  }
   input.addEventListener("input", render);
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown" && hits.length) {
@@ -220,6 +224,10 @@ function initSearch(): void {
     } else if (e.key === "Enter" && hits.length) {
       e.preventDefault();
       window.location.href = `/docs/${hits[active].entry.slug}`;
+    } else if (e.key === "Escape") {
+      // type="search" 会原生吞掉 Esc 用于清空输入，这里改为直接关闭弹层
+      e.preventDefault();
+      close();
     }
   });
   document.addEventListener("keydown", (e) => {
@@ -227,12 +235,10 @@ function initSearch(): void {
     const typing = tag === "input" || tag === "textarea" || (document.activeElement as HTMLElement)?.isContentEditable;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
       e.preventDefault();
-      modal.hidden ? open() : close();
-    } else if (e.key === "/" && !typing && modal.hidden) {
+      modal.open ? close() : open();
+    } else if (e.key === "/" && !typing && !modal.open) {
       e.preventDefault();
       open();
-    } else if (e.key === "Escape" && !modal.hidden) {
-      close();
     }
   });
 }
