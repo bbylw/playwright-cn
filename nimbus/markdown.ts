@@ -2,7 +2,7 @@
  * Nimbus Markdown 管线 — frontmatter 解析、marked 渲染、
  * 语法高亮、GitHub 风格提示块、TOC 提取、搜索纯文本。
  */
-import { Marked } from "marked";
+import { Marked, type Tokens } from "marked";
 import { escapeHtml } from "./core.ts";
 import { highlight } from "./highlight.ts";
 
@@ -100,26 +100,28 @@ export function renderMarkdown(source: string): RenderedDoc {
   const marked = new Marked({ gfm: true, breaks: false });
   marked.use({
     renderer: {
-      heading(text: string, level: number): string {
+      heading({ tokens, depth }): string {
+        const text = this.parser.parseInline(tokens);
         const plain = text.replace(/<[^>]*>/g, "");
-        if (level === 2 || level === 3) {
+        if (depth === 2 || depth === 3) {
           const id = uniqueId(plain);
-          toc.push({ id, text: plain, depth: level as 2 | 3 });
-          return `<h${level} id="${id}"><a class="heading-anchor" href="#${id}" aria-label="锚点：${escapeHtml(plain)}">#</a>${text}</h${level}>\n`;
+          toc.push({ id, text: plain, depth: depth as 2 | 3 });
+          return `<h${depth} id="${id}"><a class="heading-anchor" href="#${id}" aria-label="锚点：${escapeHtml(plain)}">#</a>${text}</h${depth}>\n`;
         }
-        return `<h${level}>${text}</h${level}>\n`;
+        return `<h${depth}>${text}</h${depth}>\n`;
       },
-      code(code: string, infostring: string | undefined): string {
-        const lang = (infostring ?? "").trim().split(/\s+/)[0] || "text";
-        const label = LANG_LABELS[lang.toLowerCase()] ?? lang.toUpperCase();
-        const body = highlight(code.replace(/\n+$/, ""), lang);
+      code({ text, lang }): string {
+        const language = (lang ?? "").trim().split(/\s+/)[0] || "text";
+        const label = LANG_LABELS[language.toLowerCase()] ?? language.toUpperCase();
+        const body = highlight(text.replace(/\n+$/, ""), language);
         return (
           `<div class="code-block group/code"><div class="code-head">` +
           `<span class="code-lang">${escapeHtml(label)}</span>${COPY_BTN}</div>` +
           `<pre><code>${body}</code></pre></div>\n`
         );
       },
-      blockquote(quote: string): string {
+      blockquote({ tokens }): string {
+        const quote = this.parser.parse(tokens);
         const m = /^\s*<p>\[!(NOTE|TIP|WARNING)\]\s*(?:<br>)?\n?/.exec(quote);
         if (m) {
           const alert = ALERTS[m[1]];
@@ -132,14 +134,25 @@ export function renderMarkdown(source: string): RenderedDoc {
         }
         return `<blockquote>${quote}</blockquote>\n`;
       },
-      link(href: string, title: string | null | undefined, text: string): string {
+      link({ href, title, tokens }): string {
+        const text = this.parser.parseInline(tokens);
         const t = title ? ` title="${escapeHtml(title)}"` : "";
         if (/^https?:\/\//.test(href)) {
           return `<a href="${escapeHtml(href)}"${t} target="_blank" rel="noopener noreferrer">${text}</a>`;
         }
         return `<a href="${escapeHtml(href)}"${t}>${text}</a>`;
       },
-      table(header: string, body: string): string {
+      table(token: Tokens.Table): string {
+        const renderRow = (cells: Tokens.TableCell[]): string =>
+          `<tr>${cells
+            .map((cell) => {
+              const tag = cell.header ? "th" : "td";
+              const align = cell.align ? ` align="${cell.align}"` : "";
+              return `<${tag}${align}>${this.parser.parseInline(cell.tokens)}</${tag}>`;
+            })
+            .join("")}</tr>`;
+        const header = renderRow(token.header);
+        const body = token.rows.map(renderRow).join("");
         return `<div class="table-wrap"><table><thead>${header}</thead><tbody>${body}</tbody></table></div>\n`;
       },
     },

@@ -14,5 +14,5 @@
     "types": ["bun-types"]
   },
   "include": ["nimbus/**/*.ts", "src/**/*.ts", "scripts/**/*.ts", "server.ts"],
-  "exclude": ["node_modules", "assets", "docs"]
+  "exclude": ["node_modules", "dist"]
 }
