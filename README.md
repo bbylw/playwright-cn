@@ -6,6 +6,21 @@
 
 Playwright 是一个用于 Web 自动化和测试的框架。它通过单一 API 驱动 Chromium、Firefox 和 WebKit —— 适用于测试、脚本以及 AI 代理工具。
 
+## 本站开发（Nimbus + Bun）
+
+本仓库是 Playwright 中文落地页与文档站（[playwright.ndjp.net](https://playwright.ndjp.net)），技术栈为 **Nimbus**（仓库内置的轻量 HTML 组件 / Markdown 渲染层，见 `nimbus/`）+ **Bun** + Tailwind CSS v4 本地编译，构建产物直接输出到仓库根目录供 GitHub Pages 服务。
+
+```bash
+bun install        # 安装依赖
+bun run dev        # 开发服务器（http://localhost:3000，监听源码自动重建）
+bun run build      # 静态构建：index.html + docs/* + assets/*
+bun run preview    # 仅服务已构建产物
+```
+
+- 落地页组件：`src/pages/landing.ts`；客户端交互：`src/client/`
+- 文档内容：`content/docs/*.md`（frontmatter：title / description / section / order / slug）
+- 设计令牌与样式：`src/styles/app.css`
+
 ## 快速开始
 
 选择适合你工作流的方式：

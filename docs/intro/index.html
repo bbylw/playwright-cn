@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>简介 — Playwright 中文文档</title>
+  <meta name="description" content="Playwright 端到端测试框架的核心能力、快速上手路径与跨浏览器支持范围。">
+  <meta name="theme-color" content="#0a0d0b">
+  <meta property="og:title" content="简介 — Playwright 中文文档">
+  <meta property="og:description" content="Playwright 端到端测试框架的核心能力、快速上手路径与跨浏览器支持范围。">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22%230a0d0b%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%2272%22%20font-size%3D%2262%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22bold%22%20fill%3D%22%232fd465%22%3EP%3C%2Ftext%3E%3C%2Fsvg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/app.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script defer src="/assets/docs.js"></script>
+</head>
+<body class="antialiased " data-page="docs" data-path="/docs/intro">
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+  </div>
+  
+  <nav id="siteNav" class="fixed top-0 w-full z-50 nav-blur bg-surface-dark/70 border-b border-border/50">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="Playwright 中文首页">
+        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center shadow-lg shadow-accent/20">
+          <span class="text-surface-dark font-display font-bold text-sm">P</span>
+        </span>
+        <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright<span class="text-accent">·</span><span class="text-txt-secondary font-medium text-sm align-middle">中文</span></span>
+      </a>
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/#features" class="nav-link ">功能</a>
+        <a href="/#quickstart" class="nav-link ">快速开始</a>
+        <a href="/docs/intro" class="nav-link nav-link-active">文档</a>
+        <a href="/#mcp" class="nav-link ">MCP</a>
+        <a href="/#browsers" class="nav-link ">浏览器</a>
+      </div>
+      <div class="flex items-center gap-2.5">
+        
+        <button type="button" id="searchTrigger" class="search-trigger hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-surface border border-border hover:border-border-light text-txt-muted text-sm transition-colors" aria-label="搜索文档">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <span>搜索文档</span>
+          <kbd class="kbd">Ctrl K</kbd>
+        </button>
+        <a href="https://github.com/microsoft/playwright" target="_blank" rel="noopener noreferrer" class="w-9 h-9 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-transparent hover:border-border transition-colors" aria-label="GitHub 仓库"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.04 11.04 0 015.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .31.21.67.8.55A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></a>
+        <button type="button" id="menuBtn" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-border transition-colors" aria-label="打开菜单" aria-expanded="false">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="mobile-menu flex-col gap-1 px-5 pb-4 md:hidden bg-surface-dark/95 border-b border-border">
+      <a href="/#features" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">功能</a>
+      <a href="/#quickstart" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">快速开始</a>
+      <a href="/docs/intro" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">文档</a>
+      <a href="/#mcp" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">MCP</a>
+      <a href="/#browsers" class="text-txt-secondary hover:text-txt-primary py-2.5 text-sm">浏览器</a>
+      <button type="button" id="searchTriggerMobile" class="text-left text-accent font-semibold py-2.5 text-sm">搜索文档 ⌘K</button>
+    </div>
+  </nav>
+  
+  <div class="docs-shell max-w-[1400px] mx-auto px-5 sm:px-8 pt-16">
+    
+  <aside id="docsSidebar" class="docs-sidebar" aria-label="文档目录">
+    <div class="lg:hidden flex items-center justify-between px-4 pb-3 mb-2 border-b border-border">
+      <span class="font-display font-semibold text-sm text-txt-primary">文档目录</span>
+      <button type="button" id="sidebarClose" class="w-8 h-8 flex items-center justify-center rounded-lg text-txt-secondary hover:text-txt-primary hover:bg-surface border border-border transition-colors" aria-label="关闭目录">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="docs-sidebar-inner">
+      
+      <div class="mb-7">
+        <div class="flex items-center gap-2 px-3 mb-2 text-txt-muted">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="font-display text-xs font-semibold uppercase tracking-widest">入门</span>
+        </div>
+        <ul class="space-y-0.5">
+          
+          <li>
+            <a href="/docs/intro" class="docs-side-link docs-side-link-active" aria-current="page">简介</a>
+          </li>
+          <li>
+            <a href="/docs/installation" class="docs-side-link " >安装</a>
+          </li>
+          <li>
+            <a href="/docs/writing-tests" class="docs-side-link " >编写测试</a>
+          </li>
+          <li>
+            <a href="/docs/running-tests" class="docs-side-link " >运行测试</a>
+          </li>
+          <li>
+            <a href="/docs/codegen" class="docs-side-link " >生成测试</a>
+          </li>
+        </ul>
+      </div>
+      <div class="mb-7">
+        <div class="flex items-center gap-2 px-3 mb-2 text-txt-muted">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          <span class="font-display text-xs font-semibold uppercase tracking-widest">核心概念</span>
+        </div>
+        <ul class="space-y-0.5">
+          
+          <li>
+            <a href="/docs/locators" class="docs-side-link " >定位器</a>
+          </li>
+          <li>
+            <a href="/docs/assertions" class="docs-side-link " >断言</a>
+          </li>
+          <li>
+            <a href="/docs/actions" class="docs-side-link " >操作与自动等待</a>
+          </li>
+          <li>
+            <a href="/docs/auth" class="docs-side-link " >认证</a>
+          </li>
+          <li>
+            <a href="/docs/trace-viewer" class="docs-side-link " >追踪查看器</a>
+          </li>
+        </ul>
+      </div>
+      <div class="mb-7">
+        <div class="flex items-center gap-2 px-3 mb-2 text-txt-muted">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span class="font-display text-xs font-semibold uppercase tracking-widest">工具</span>
+        </div>
+        <ul class="space-y-0.5">
+          
+          <li>
+            <a href="/docs/cli" class="docs-side-link " >Playwright CLI</a>
+          </li>
+          <li>
+            <a href="/docs/mcp" class="docs-side-link " >Playwright MCP</a>
+          </li>
+          <li>
+            <a href="/docs/library" class="docs-side-link " >Library 脚本</a>
+          </li>
+        </ul>
+      </div>
+      <div class="mb-7">
+        <div class="flex items-center gap-2 px-3 mb-2 text-txt-muted">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          <span class="font-display text-xs font-semibold uppercase tracking-widest">配置</span>
+        </div>
+        <ul class="space-y-0.5">
+          
+          <li>
+            <a href="/docs/configuration" class="docs-side-link " >测试配置</a>
+          </li>
+          <li>
+            <a href="/docs/ci" class="docs-side-link " >持续集成</a>
+          </li>
+        </ul>
+      </div>
+      <div class="px-3 pt-4 border-t border-border/50">
+        <a href="https://playwright.dev/docs/api/class-playwright" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-txt-muted hover:text-accent text-xs transition-colors">
+          完整 API 参考（英文）
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+  <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+    <main class="docs-main min-w-0">
+      <button type="button" id="sidebarToggle" class="lg:hidden inline-flex items-center gap-2 mt-6 mb-2 px-3 py-1.5 rounded-lg bg-surface border border-border text-txt-secondary text-sm hover:border-border-light transition-colors" aria-expanded="false" aria-controls="docsSidebar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 6h16M4 12h10M4 18h16"/></svg>
+        文档目录
+      </button>
+      <nav class="flex items-center gap-2 text-xs text-txt-muted mt-6 lg:mt-10 mb-4" aria-label="面包屑">
+        <a href="/docs/intro" class="hover:text-accent transition-colors">文档</a>
+        <span aria-hidden="true">›</span>
+        <span>入门</span>
+        <span aria-hidden="true">›</span>
+        <span class="text-txt-secondary">简介</span>
+      </nav>
+      <header class="mb-10 pb-8 border-b border-border/50">
+        <h1 class="font-display text-3xl sm:text-4xl font-bold text-txt-primary tracking-tight mb-3">简介</h1>
+        <p class="text-txt-secondary leading-relaxed">Playwright 端到端测试框架的核心能力、快速上手路径与跨浏览器支持范围。</p>
+      </header>
+      <article class="prose-docs" id="docContent">
+        <p>Playwright 是微软开源的 Web 端到端测试框架。它用一套 API 驱动 Chromium、Firefox 和 WebKit 三个引擎，在本地和 CI 上以并行、隔离的方式运行测试，并自带自动等待断言、代码录制、执行追踪和测试报告。</p>
+<p>测试运行器以 <code>@playwright/test</code> 包发布，浏览器自动化能力则由 <a href="/docs/library">Library</a> 单独提供。</p>
+<h2 id="核心能力"><a class="heading-anchor" href="#核心能力" aria-label="锚点：核心能力">#</a>核心能力</h2>
+<p><strong>跨浏览器。</strong> 同一份测试代码在 Chromium、Firefox 和 WebKit 上运行，无需为 Safari 准备一台 macOS 机器 —— WebKit 由 Playwright 自带。</p>
+<p><strong>自动等待。</strong> 操作和断言都会等待元素满足条件，超时才失败。代码里不需要 <code>sleep</code> 或轮询：</p>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">TypeScript</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code><span class="tk-kw">await</span> page.<span class="tk-fn">getByRole</span>(<span class="tk-str">&#39;button&#39;</span>, { name: <span class="tk-str">&#39;提交&#39;</span> }).<span class="tk-fn">click</span>();
+<span class="tk-kw">await</span> <span class="tk-fn">expect</span>(page.<span class="tk-fn">getByRole</span>(<span class="tk-str">&#39;status&#39;</span>)).<span class="tk-fn">toHaveText</span>(<span class="tk-str">&#39;保存成功&#39;</span>);</code></pre></div>
+<p><strong>Web 优先断言。</strong> <code>expect(...)</code> 配合定位器会自动重试直到断言成立，并在失败时打印重试过程与页面对比信息。</p>
+<p><strong>全新浏览器上下文。</strong> 每个测试都在独立的 <a href="https://playwright.dev/docs/auth#basic-shared-account-in-all-tests" target="_blank" rel="noopener noreferrer">浏览器上下文</a> 中运行，等同于全新的浏览器配置文件，Cookie、本地存储和缓存互不污染，成本却远低于重启浏览器。</p>
+<p><strong>弹性定位器。</strong> 优先使用用户视角的语义定位方式，详见<a href="/docs/locators">定位器</a>：</p>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">TypeScript</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code>page.<span class="tk-fn">getByRole</span>(<span class="tk-str">&#39;button&#39;</span>, { name: <span class="tk-str">&#39;提交&#39;</span> });
+page.<span class="tk-fn">getByLabel</span>(<span class="tk-str">&#39;邮箱&#39;</span>);
+page.<span class="tk-fn">getByPlaceholder</span>(<span class="tk-str">&#39;搜索…&#39;</span>);
+page.<span class="tk-fn">getByTestId</span>(<span class="tk-str">&#39;login-form&#39;</span>);</code></pre></div>
+<p><strong>完整的调试工具链。</strong> 失败时自动捕获<a href="/docs/trace-viewer">追踪</a>、截图和视频；在 Trace Viewer 中逐步检查每个操作、DOM 快照、网络请求和控制台输出。</p>
+<p><strong>并行与分片。</strong> 测试文件默认并行执行，CI 中可按分片水平扩展，详见<a href="/docs/ci">持续集成</a>。</p>
+<h2 id="快速开始"><a class="heading-anchor" href="#快速开始" aria-label="锚点：快速开始">#</a>快速开始</h2>
+<h3 id="创建新项目"><a class="heading-anchor" href="#创建新项目" aria-label="锚点：创建新项目">#</a>创建新项目</h3>
+<p>在项目目录中运行脚手架，它会询问测试目录、浏览器和是否接入 CI，然后自动安装依赖与浏览器：</p>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">终端</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code><span class="tk-fn">bun</span> <span class="tk-kw">create</span> <span class="tk-fn">playwright</span></code></pre></div>
+<p>使用 npm 时对应 <code>npm init playwright@latest</code>。</p>
+<h3 id="加入已有项目"><a class="heading-anchor" href="#加入已有项目" aria-label="锚点：加入已有项目">#</a>加入已有项目</h3>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">终端</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code><span class="tk-fn">bun</span> <span class="tk-kw">add</span> <span class="tk-prop">-D</span> @<span class="tk-fn">playwright</span>/<span class="tk-kw">test</span>
+<span class="tk-fn">bunx</span> <span class="tk-fn">playwright</span> <span class="tk-kw">install</span></code></pre></div>
+<p><code>bunx</code> 等价于 npm 生态的 <code>npx</code>。<code>bunx playwright install</code> 只下载浏览器二进制，详见<a href="/docs/installation">安装</a>。</p>
+<h2 id="第一个测试"><a class="heading-anchor" href="#第一个测试" aria-label="锚点：第一个测试">#</a>第一个测试</h2>
+<p>创建 <code>tests/example.spec.ts</code>：</p>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">TypeScript</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code><span class="tk-kw">import</span> { test, expect } <span class="tk-kw">from</span> <span class="tk-str">&#39;@playwright/test&#39;</span>;
+
+<span class="tk-fn">test</span>(<span class="tk-str">&#39;页面标题正确&#39;</span>, <span class="tk-kw">async</span> ({ page }) =&gt; {
+  <span class="tk-kw">await</span> page.<span class="tk-fn">goto</span>(<span class="tk-str">&#39;https://playwright.dev/&#39;</span>);
+  <span class="tk-kw">await</span> <span class="tk-fn">expect</span>(page).<span class="tk-fn">toHaveTitle</span>(/<span class="tk-type">Playwright</span>/);
+});
+
+<span class="tk-fn">test</span>(<span class="tk-str">&#39;可以进入安装文档&#39;</span>, <span class="tk-kw">async</span> ({ page }) =&gt; {
+  <span class="tk-kw">await</span> page.<span class="tk-fn">goto</span>(<span class="tk-str">&#39;https://playwright.dev/&#39;</span>);
+  <span class="tk-kw">await</span> page.<span class="tk-fn">getByRole</span>(<span class="tk-str">&#39;link&#39;</span>, { name: <span class="tk-str">&#39;Get started&#39;</span> }).<span class="tk-fn">click</span>();
+  <span class="tk-kw">await</span> <span class="tk-fn">expect</span>(page.<span class="tk-fn">getByRole</span>(<span class="tk-str">&#39;heading&#39;</span>, { name: <span class="tk-str">&#39;Installation&#39;</span> })).<span class="tk-fn">toBeVisible</span>();
+});</code></pre></div>
+<p>运行：</p>
+<div class="code-block group/code"><div class="code-head"><span class="code-lang">终端</span><button type="button" class="copy-btn" data-copy aria-label="复制代码" title="复制"><svg class="icon-copy w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" stroke-width="1.6"/><path stroke-width="1.6" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><svg class="icon-check w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="copy-label">复制</span></button></div><pre><code><span class="tk-fn">bunx</span> <span class="tk-fn">playwright</span> <span class="tk-kw">test</span></code></pre></div>
+<p>测试默认以无头模式在所有已配置的浏览器上并行执行。</p>
+<h2 id="浏览器支持"><a class="heading-anchor" href="#浏览器支持" aria-label="锚点：浏览器支持">#</a>浏览器支持</h2>
+<div class="table-wrap"><table><thead><tr>
+<th>引擎</th>
+<th>版本</th>
+<th>Linux</th>
+<th>macOS</th>
+<th>Windows</th>
+</tr>
+</thead><tbody><tr>
+<td>Chromium</td>
+<td>147</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>Firefox</td>
+<td>149</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>WebKit</td>
+<td>26.4</td>
+<td>支持</td>
+<td>支持</td>
+<td>支持</td>
+</tr>
+</tbody></table></div>
+<p>所有引擎同时支持无头和有头模式。Chromium 默认使用 <a href="https://developer.chrome.com/blog/chrome-for-testing" target="_blank" rel="noopener noreferrer">Chrome for Testing</a> 构建，也可以选择安装后通过 <code>channel: &#39;chrome&#39;</code> 使用本机 Chrome，见<a href="/docs/configuration">测试配置</a>。</p>
+<div class="callout callout-note"><div class="callout-title"><svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>注意</span></div><div class="callout-body"><p>Playwright 使用与系统浏览器版本解耦的专用构建，因此每次升级 Playwright 才会更新引擎，测试结果在同一次发布内保持稳定。</p>
+</p></div></div>
+<h2 id="下一步"><a class="heading-anchor" href="#下一步" aria-label="锚点：下一步">#</a>下一步</h2>
+<ul>
+<li><a href="/docs/installation">安装</a>：安装浏览器、系统依赖与版本管理</li>
+<li><a href="/docs/writing-tests">编写测试</a>：用例、钩子、fixture 与参数化</li>
+<li><a href="/docs/running-tests">运行测试</a>：过滤、调试、并行和报告</li>
+<li><a href="/docs/locators">定位器</a> 与 <a href="/docs/assertions">断言</a>：测试代码的两个基本构件</li>
+<li><a href="/docs/auth">认证</a>：复用登录状态，跳过重复登录</li>
+<li><a href="/docs/ci">持续集成</a>：GitHub Actions、缓存与分片</li>
+</ul>
+<h2 id="更多资源"><a class="heading-anchor" href="#更多资源" aria-label="锚点：更多资源">#</a>更多资源</h2>
+<ul>
+<li><a href="https://playwright.dev/docs/api/class-playwright" target="_blank" rel="noopener noreferrer">API 参考</a></li>
+<li><a href="https://github.com/microsoft/playwright" target="_blank" rel="noopener noreferrer">GitHub 仓库</a></li>
+<li><a href="https://github.com/microsoft/playwright/releases" target="_blank" rel="noopener noreferrer">更新日志</a></li>
+</ul>
+<p>Playwright 还提供 <a href="https://playwright.dev/python/docs/intro" target="_blank" rel="noopener noreferrer">Python</a>、<a href="https://playwright.dev/java/docs/intro" target="_blank" rel="noopener noreferrer">Java</a> 和 <a href="https://playwright.dev/dotnet/docs/intro" target="_blank" rel="noopener noreferrer">.NET</a> 版本。</p>
+
+      </article>
+      <div class="feedback-widget mt-12 p-5 rounded-xl bg-surface border border-border" data-feedback="intro">
+        <p class="text-sm text-txt-secondary mb-3" data-feedback-question>这篇文档对你有帮助吗？</p>
+        <div class="flex gap-2" data-feedback-actions>
+          <button type="button" class="feedback-btn" data-feedback-value="up"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>有帮助</button>
+          <button type="button" class="feedback-btn" data-feedback-value="down"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5 6h2a2 2 0 002-2v-6a2 2 0 00-2-2h-2.5"/></svg>待改进</button>
+        </div>
+      </div>
+      
+  <nav class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-14" aria-label="翻页">
+    <span class="hidden sm:block"></span>
+    
+    <a href="/docs/installation" class="pager-card group text-right">
+      <span class="text-txt-muted text-xs mb-1 block">下一篇 →</span>
+      <span class="font-display font-semibold text-txt-primary group-hover:text-accent transition-colors">安装</span>
+    </a>
+  </nav>
+    </main>
+    
+  <aside class="docs-toc hidden xl:block" aria-label="本页目录">
+    <div class="sticky top-24">
+      <h4 class="font-display text-xs font-semibold text-txt-muted uppercase tracking-widest mb-3">本页内容</h4>
+      <ul class="space-y-1 border-l border-border">
+        
+        <li>
+          <a href="#核心能力" class="toc-link " data-toc="核心能力">核心能力</a>
+        </li>
+        <li>
+          <a href="#快速开始" class="toc-link " data-toc="快速开始">快速开始</a>
+        </li>
+        <li>
+          <a href="#创建新项目" class="toc-link toc-link-sub" data-toc="创建新项目">创建新项目</a>
+        </li>
+        <li>
+          <a href="#加入已有项目" class="toc-link toc-link-sub" data-toc="加入已有项目">加入已有项目</a>
+        </li>
+        <li>
+          <a href="#第一个测试" class="toc-link " data-toc="第一个测试">第一个测试</a>
+        </li>
+        <li>
+          <a href="#浏览器支持" class="toc-link " data-toc="浏览器支持">浏览器支持</a>
+        </li>
+        <li>
+          <a href="#下一步" class="toc-link " data-toc="下一步">下一步</a>
+        </li>
+        <li>
+          <a href="#更多资源" class="toc-link " data-toc="更多资源">更多资源</a>
+        </li>
+      </ul>
+    </div>
+  </aside>
+  </div>
+  
+  <div id="searchModal" class="search-modal" role="dialog" aria-modal="true" aria-label="搜索文档" hidden>
+    <div class="search-panel">
+      <div class="flex items-center gap-3 px-4 border-b border-border">
+        <svg class="w-4 h-4 text-txt-muted shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input id="searchInput" type="search" placeholder="搜索文档、API、命令…" class="w-full bg-transparent py-3.5 text-sm text-txt-primary placeholder:text-txt-muted outline-none" autocomplete="off" spellcheck="false">
+        <kbd class="kbd shrink-0">Esc</kbd>
+      </div>
+      <ul id="searchResults" class="search-results" role="listbox"></ul>
+      <div id="searchEmpty" class="px-4 py-8 text-center text-txt-muted text-sm">输入关键词开始搜索，例如「定位器」「storageState」「shard」</div>
+      <div class="flex items-center gap-4 px-4 py-2.5 border-t border-border text-txt-muted text-xs">
+        <span><kbd class="kbd">↑</kbd> <kbd class="kbd">↓</kbd> 导航</span>
+        <span><kbd class="kbd">Enter</kbd> 打开</span>
+        <span class="ml-auto" id="searchCount"></span>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="border-t border-border/50 bg-surface-dark/60 relative">
+    <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-14">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-10">
+        <div class="col-span-2">
+          <a href="/" class="flex items-center gap-2.5 mb-4">
+            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center">
+              <span class="text-surface-dark font-display font-bold text-sm">P</span>
+            </span>
+            <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright·中文</span>
+          </a>
+          <p class="text-txt-secondary text-sm leading-relaxed max-w-xs mb-5">通过单一 API 驱动 Chromium、Firefox 和 WebKit 的 Web 自动化与测试框架。非官方中文社区站点。</p>
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-surface text-xs text-txt-muted">
+            <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            由 <span class="text-txt-secondary font-medium">Nimbus + Bun</span> 构建
+          </span>
+        </div>
+        
+    <div>
+      <h4 class="font-display text-xs font-semibold text-txt-muted uppercase tracking-widest mb-4">产品</h4>
+      <ul class="space-y-2.5">
+    <li><a href="/#test"  class="text-txt-secondary hover:text-accent text-sm transition-colors">Playwright Test</a></li>
+    <li><a href="/#cli"  class="text-txt-secondary hover:text-accent text-sm transition-colors">Playwright CLI</a></li>
+    <li><a href="/#mcp"  class="text-txt-secondary hover:text-accent text-sm transition-colors">Playwright MCP</a></li>
+    <li><a href="/#library"  class="text-txt-secondary hover:text-accent text-sm transition-colors">Playwright Library</a></li></ul>
+    </div>
+        
+    <div>
+      <h4 class="font-display text-xs font-semibold text-txt-muted uppercase tracking-widest mb-4">文档</h4>
+      <ul class="space-y-2.5">
+    <li><a href="/docs/intro"  class="text-txt-secondary hover:text-accent text-sm transition-colors">简介</a></li>
+    <li><a href="/docs/installation"  class="text-txt-secondary hover:text-accent text-sm transition-colors">安装</a></li>
+    <li><a href="/docs/locators"  class="text-txt-secondary hover:text-accent text-sm transition-colors">定位器</a></li>
+    <li><a href="/docs/assertions"  class="text-txt-secondary hover:text-accent text-sm transition-colors">断言</a></li>
+    <li><a href="/docs/configuration"  class="text-txt-secondary hover:text-accent text-sm transition-colors">测试配置</a></li></ul>
+    </div>
+        
+    <div>
+      <h4 class="font-display text-xs font-semibold text-txt-muted uppercase tracking-widest mb-4">社区</h4>
+      <ul class="space-y-2.5">
+    <li><a href="https://github.com/microsoft/playwright" target="_blank" rel="noopener noreferrer" class="text-txt-secondary hover:text-accent text-sm transition-colors">GitHub</a></li>
+    <li><a href="https://aka.ms/playwright/discord" target="_blank" rel="noopener noreferrer" class="text-txt-secondary hover:text-accent text-sm transition-colors">Discord</a></li>
+    <li><a href="https://playwright.dev" target="_blank" rel="noopener noreferrer" class="text-txt-secondary hover:text-accent text-sm transition-colors">官方文档</a></li>
+    <li><a href="https://www.npmjs.com/package/playwright" target="_blank" rel="noopener noreferrer" class="text-txt-secondary hover:text-accent text-sm transition-colors">npm</a></li></ul>
+    </div>
+      </div>
+      <div class="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p class="text-txt-muted text-xs">© 2026 Playwright 中文社区 · Playwright 采用 Apache-2.0 许可证</p>
+        <p class="text-txt-muted text-xs">Chromium 147 · Firefox 149 · WebKit 26.4</p>
+      </div>
+    </div>
+  </footer>
+  <button type="button" id="backToTop" class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-xl bg-surface border border-border hover:border-accent/40 text-txt-secondary hover:text-accent flex items-center justify-center shadow-xl shadow-black/40 transition-colors" aria-label="回到顶部">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+  </button>
+</body>
+</html>

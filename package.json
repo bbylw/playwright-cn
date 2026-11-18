@@ -1,0 +1,20 @@
+{
+  "name": "playwright-cn",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright 中文落地页与文档 — Nimbus + Bun 静态站点",
+  "scripts": {
+    "dev": "bun run server.ts --dev",
+    "build": "bun run scripts/build.ts",
+    "preview": "bun run server.ts"
+  },
+  "dependencies": {
+    "marked": "12.0.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "@types/bun": "^1.2.19",
+    "tailwindcss": "^4.1.11"
+  }
+}
