@@ -6,22 +6,6 @@
 
 Playwright 是一个用于 Web 自动化和测试的框架。它通过单一 API 驱动 Chromium、Firefox 和 WebKit —— 适用于测试、脚本以及 AI Agent 工具。
 
-## 本站开发（Nimbus + Bun）
-
-本仓库是 Playwright 中文落地页与文档站（[playwright.ndjp.net](https://playwright.ndjp.net)），技术栈为 **Nimbus**（仓库内置的轻量 HTML 组件 / Markdown 渲染层，见 `nimbus/`）+ **Bun** + Tailwind CSS v4 本地编译。构建产物输出到 `dist/`（不入库），推送到 `main` 后由 GitHub Actions（`.github/workflows/deploy.yml`）自动构建并发布到 GitHub Pages。
-
-```bash
-bun install        # 安装依赖
-bun run dev        # 开发服务器（http://localhost:3000，监听源码自动重建）
-bun run build      # 静态构建 → dist/（index.html + docs/* + assets/* + CNAME）
-bun run preview    # 服务 dist/（缺失时自动构建一次）
-bun run typecheck  # TypeScript 类型检查
-```
-
-- 落地页组件：`src/pages/landing.ts`；客户端交互：`src/client/`
-- 文档内容：`content/docs/*.md`（frontmatter：title / description / section / order / slug）
-- 设计令牌与样式：`src/styles/app.css`
-
 ## 快速开始
 
 选择适合你工作流的方式：
@@ -29,7 +13,7 @@ bun run typecheck  # TypeScript 类型检查
 | | 适用场景 | 安装方式 |
 |---|---|---|
 | **[Playwright Test](#playwright-test)** | 端到端测试 | `npm init playwright@latest` |
-| **[Playwright CLI](#playwright-cli)** | 编码Agent（Claude Code、Copilot） | `npm i -g @playwright/cli@latest` |
+| **[Playwright CLI](#playwright-cli)** | 编码 Agent（Claude Code、Copilot） | `npm i -g @playwright/cli@latest` |
 | **[Playwright MCP](#playwright-mcp)** | AI Agent 和 LLM 驱动的自动化 | `npx @playwright/mcp@latest` |
 | **[Playwright Library](#playwright-library)** | 浏览器自动化脚本 | `npm i playwright` |
 | **[VS Code 扩展](#vs-code-扩展)** | 在 VS Code 中编写和调试测试 | [从应用商店安装](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) |
@@ -126,7 +110,7 @@ npx playwright show-trace trace.zip
 
 ## Playwright CLI
 
-[Playwright CLI](https://github.com/microsoft/playwright-cli) 是为编码Agent 设计的浏览器自动化命令行接口。它比 MCP 更节省 token —— 命令避免将大型工具 schema 和可访问性树加载到模型上下文中。
+[Playwright CLI](https://github.com/microsoft/playwright-cli) 是为编码 Agent 设计的浏览器自动化命令行接口。它比 MCP 更节省 token —— 命令避免将大型工具 schema 和可访问性树加载到模型上下文中。
 
 ### 安装
 
@@ -134,7 +118,7 @@ npx playwright show-trace trace.zip
 npm install -g @playwright/cli@latest
 ```
 
-可选安装技能以获得更丰富的Agent 集成：
+可选安装技能以获得更丰富的 Agent 集成：
 
 ```bash
 playwright-cli install --skills
@@ -142,7 +126,7 @@ playwright-cli install --skills
 
 ### 使用
 
-将编码Agent 指向任务：
+将编码 Agent 指向任务：
 
 ```
 使用 playwright-cli 测试 https://demo.playwright.dev/todomvc 上的"添加待办"流程。
@@ -174,7 +158,7 @@ playwright-cli show
 
 ## Playwright MCP
 
-[Playwright MCP 服务器](https://github.com/microsoft/playwright-mcp) 通过 [模型上下文协议](https://modelcontextprotocol.io) 为 AI Agent 提供完整的浏览器控制。Agent 使用结构化的可访问性快照与页面交互 —— 无需视觉模型或截图。
+[Playwright MCP 服务器](https://github.com/microsoft/playwright-mcp) 通过 [模型上下文协议](https://modelcontextprotocol.io) 为 AI Agent 提供完整的浏览器控制。 Agent 使用结构化的可访问性快照与页面交互 —— 无需视觉模型或截图。
 
 ### 设置
 
@@ -327,7 +311,7 @@ Playwright 也提供 [Python](https://playwright.dev/python/docs/intro)、[.NET]
 * [文档](https://playwright.dev)
 * [API 参考](https://playwright.dev/docs/api/class-playwright)
 * [MCP 服务器](https://github.com/microsoft/playwright-mcp)
-* [编码Agent CLI](https://github.com/microsoft/playwright-cli)
+* [编码 Agent CLI](https://github.com/microsoft/playwright-cli)
 * [VS Code 扩展](https://github.com/microsoft/playwright-vscode)
 * [贡献指南](https://github.com/microsoft/playwright/blob/main/CONTRIBUTING.md)
 * [更新日志](https://github.com/microsoft/playwright/releases)

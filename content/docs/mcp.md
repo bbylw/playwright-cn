@@ -6,7 +6,7 @@ order: 2
 slug: mcp
 ---
 
-Playwright MCP（`@playwright/mcp`）把浏览器控制暴露为 [模型上下文协议](https://modelcontextprotocol.io) 工具。Agent 读取页面的结构化可访问性快照，用元素引用点击和输入 —— 不依赖视觉模型，也不靠像素坐标猜测，行为确定且可回放。
+Playwright MCP（`@playwright/mcp`）把浏览器控制暴露为 [模型上下文协议](https://modelcontextprotocol.io) 工具。 Agent 读取页面的结构化可访问性快照，用元素引用点击和输入 —— 不依赖视觉模型，也不靠像素坐标猜测，行为确定且可回放。
 
 ## 快速配置
 
@@ -33,7 +33,7 @@ claude mcp add playwright bunx @playwright/mcp@latest
 
 ##Agent 看到什么
 
-页面在Agent 眼中是一棵带引用的可访问性树，而不是截图。典型输出（TodoMVC）包含以下节点：
+页面在 Agent 眼中是一棵带引用的可访问性树，而不是截图。典型输出（TodoMVC）包含以下节点：
 
 - `heading "todos" [level=1]`
 - `textbox "What needs to be done?" [ref=e5]`
@@ -155,9 +155,9 @@ bunx @playwright/mcp@latest --port 8931
 | | Playwright MCP | Playwright CLI |
 |---|---|---|
 | 上下文成本 | 快照与工具 schema 进入模型上下文 | 命令输出按需裁剪，更省 token |
-| 适合 | 探索式自动化、自愈测试、长时间自主任务 | 高吞吐编码Agent，同时处理代码库与浏览器 |
+| 适合 | 探索式自动化、自愈测试、长时间自主任务 | 高吞吐编码 Agent，同时处理代码库与浏览器 |
 | 交互粒度 | 逐步内省页面结构 | 单条 shell 指令 |
 | 详见 | 本页 | [Playwright CLI](/docs/cli) |
 
 > [!WARNING]
-> Playwright MCP 不是安全边界。Agent 获得的是真实浏览器控制权，请以最小能力集启动、用 `allowedOrigins` 收窄可访问来源，并在客户端审阅所有进入模型的响应内容。凭证与令牌应放进 `secrets` 参数，而不是写进页面或提示词。
+> Playwright MCP 不是安全边界。 Agent 获得的是真实浏览器控制权，请以最小能力集启动、用 `allowedOrigins` 收窄可访问来源，并在客户端审阅所有进入模型的响应内容。凭证与令牌应放进 `secrets` 参数，而不是写进页面或提示词。

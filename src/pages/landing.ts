@@ -226,7 +226,7 @@ function quickstart(): Html {
   const cards: Card[] = [
     { href: "#test", icon: icons.clipboard, tone: "bg-accent/10 border border-accent/20 text-accent", hover: "group-hover:text-accent", title: "Playwright Test", desc: "端到端测试运行器，专为 E2E 测试构建",
       cmd: pmCommand({ bun: "bun create playwright", npm: "npm init playwright@latest", pnpm: "pnpm create playwright", yarn: "yarn create playwright" }) },
-    { href: "#cli", icon: icons.terminal, tone: "bg-cyan/10 border border-cyan/20 text-cyan", hover: "group-hover:text-cyan", title: "Playwright CLI", desc: "为编码Agent 设计的命令行接口",
+    { href: "#cli", icon: icons.terminal, tone: "bg-cyan/10 border border-cyan/20 text-cyan", hover: "group-hover:text-cyan", title: "Playwright CLI", desc: "为编码 Agent 设计的命令行接口",
       cmd: pmCommand({ bun: "bun add -g @playwright/cli@latest", npm: "npm i -g @playwright/cli@latest", pnpm: "pnpm add -g @playwright/cli@latest", yarn: "yarn global add @playwright/cli@latest" }) },
     { href: "#mcp", icon: icons.chip, tone: "bg-violet-400/10 border border-violet-400/20 text-violet-400", hover: "group-hover:text-violet-400", title: "Playwright MCP", desc: "AI Agent 和 LLM 驱动的自动化",
       cmd: pmCommand({ bun: "bunx @playwright/mcp@latest", npm: "npx @playwright/mcp@latest", pnpm: "pnpm dlx @playwright/mcp@latest", yarn: "yarn dlx @playwright/mcp@latest" }) },
@@ -317,7 +317,7 @@ function cliSection(): Html {
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
         <div class="lg:col-span-2">
-          ${sectionHead("Playwright CLI", "text-cyan", html`为编码Agent<br>设计的 CLI`, "比 MCP 更节省 token —— 命令避免将大型工具 schema 和可访问性树加载到模型上下文中。")}
+          ${sectionHead("Playwright CLI", "text-cyan", html`为编码 Agent<br>设计的 CLI`, "比 MCP 更节省 token —— 命令避免将大型工具 schema 和可访问性树加载到模型上下文中。")}
           <div class="reveal reveal-delay-1 space-y-4">
             ${pmCommand({ bun: "bun add -g @playwright/cli@latest", npm: "npm install -g @playwright/cli@latest", pnpm: "pnpm add -g @playwright/cli@latest", yarn: "yarn global add @playwright/cli@latest" })}
             ${commandBlock("playwright-cli install --skills", "text-cyan")}
@@ -367,7 +367,7 @@ function mcpSection(): Html {
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
         <div>
-          ${sectionHead("Playwright MCP", "text-violet-400", html`AI Agent 的<br>浏览器控制`, "通过模型上下文协议为 AI Agent 提供完整的浏览器控制。Agent 使用结构化的可访问性快照与页面交互 —— 无需视觉模型。")}
+          ${sectionHead("Playwright MCP", "text-violet-400", html`AI Agent 的<br>浏览器控制`, "通过模型上下文协议为 AI Agent 提供完整的浏览器控制。 Agent 使用结构化的可访问性快照与页面交互 —— 无需视觉模型。")}
           <div class="reveal reveal-delay-1">
             ${h3label("MCP 客户端设置")}
             ${codeBlock(CODE_MCP, "json", { head: "mcp.json" })}
