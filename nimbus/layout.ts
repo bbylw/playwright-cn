@@ -11,12 +11,6 @@ export interface ShellOpts {
   bodyClass?: string;
 }
 
-const favicon =
-  "data:image/svg+xml," +
-  encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0a0d0b"/><text x="50" y="72" font-size="62" text-anchor="middle" font-family="sans-serif" font-weight="bold" fill="#2fd465">P</text></svg>`
-  );
-
 const ghIcon = html`<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11.04 11.04 0 015.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .31.21.67.8.55A11.51 11.51 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>`;
 
 function nav(active: "home" | "docs"): Html {
@@ -26,9 +20,7 @@ function nav(active: "home" | "docs"): Html {
   <nav id="siteNav" class="fixed top-0 w-full z-50 nav-blur bg-surface-dark/70 border-b border-border/50">
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
       <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="Playwright 首页">
-        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center shadow-lg shadow-accent/20">
-          <span class="text-surface-dark font-display font-bold text-sm">P</span>
-        </span>
+        <img src="/favicon.svg" alt="" width="32" height="32" class="w-8 h-8 rounded-lg shadow-lg shadow-accent/20">
         <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright</span>
       </a>
       <div class="hidden md:flex items-center gap-6">
@@ -77,9 +69,7 @@ function footer(): Html {
       <div class="grid grid-cols-2 md:grid-cols-5 gap-10">
         <div class="col-span-2">
           <a href="/" class="flex items-center gap-2.5 mb-4">
-            <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center">
-              <span class="text-surface-dark font-display font-bold text-sm">P</span>
-            </span>
+            <img src="/favicon.svg" alt="" width="32" height="32" class="w-8 h-8 rounded-lg">
             <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright</span>
           </a>
           <p class="text-txt-secondary text-sm leading-relaxed max-w-xs mb-5">通过单一 API 驱动 Chromium、Firefox 和 WebKit 的 Web 自动化与测试框架。非官方站点。</p>
@@ -117,7 +107,7 @@ export function shell(opts: ShellOpts): Html {
   <meta property="og:url" content="${canonical}">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary">
-  <link rel="icon" href="${favicon}">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
