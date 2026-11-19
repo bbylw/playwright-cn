@@ -1,12 +1,12 @@
 ---
 title: Playwright MCP
-description: 通过模型上下文协议让 AI 代理以可访问性快照驱动浏览器，覆盖工具与能力配置。
+description: 通过模型上下文协议让 AI 智能体以可访问性快照驱动浏览器，覆盖工具与能力配置。
 section: 工具
 order: 2
 slug: mcp
 ---
 
-Playwright MCP（`@playwright/mcp`）把浏览器控制暴露为 [模型上下文协议](https://modelcontextprotocol.io) 工具。代理读取页面的结构化可访问性快照，用元素引用点击和输入 —— 不依赖视觉模型，也不靠像素坐标猜测，行为确定且可回放。
+Playwright MCP（`@playwright/mcp`）把浏览器控制暴露为 [模型上下文协议](https://modelcontextprotocol.io) 工具。智能体读取页面的结构化可访问性快照，用元素引用点击和输入 —— 不依赖视觉模型，也不靠像素坐标猜测，行为确定且可回放。
 
 ## 快速配置
 
@@ -31,15 +31,15 @@ Claude Code 用命令行添加：
 claude mcp add playwright bunx @playwright/mcp@latest
 ```
 
-## 代理看到什么
+## 智能体看到什么
 
-页面在代理眼中是一棵带引用的可访问性树，而不是截图。典型输出（TodoMVC）包含以下节点：
+页面在智能体眼中是一棵带引用的可访问性树，而不是截图。典型输出（TodoMVC）包含以下节点：
 
 - `heading "todos" [level=1]`
 - `textbox "What needs to be done?" [ref=e5]`
 - `listitem` 下有 `checkbox "Toggle Todo" [ref=e10]` 与 `text: "Buy groceries"`
 
-代理随后调用 `browser_click`、`browser_type` 等工具，把 `e5`、`e10` 这类引用作为目标参数。引用来自最近一次快照，页面重新渲染后需要再次获取快照 —— 这也是 MCP 需要持续内省的原因，见[定位器](/docs/locators)了解人类编写的等价写法。
+智能体随后调用 `browser_click`、`browser_type` 等工具，把 `e5`、`e10` 这类引用作为目标参数。引用来自最近一次快照，页面重新渲染后需要再次获取快照 —— 这也是 MCP 需要持续内省的原因，见[定位器](/docs/locators)了解人类编写的等价写法。
 
 ## 核心工具
 
@@ -155,9 +155,9 @@ bunx @playwright/mcp@latest --port 8931
 | | Playwright MCP | Playwright CLI |
 |---|---|---|
 | 上下文成本 | 快照与工具 schema 进入模型上下文 | 命令输出按需裁剪，更省 token |
-| 适合 | 探索式自动化、自愈测试、长时间自主任务 | 高吞吐编码代理，同时处理代码库与浏览器 |
+| 适合 | 探索式自动化、自愈测试、长时间自主任务 | 高吞吐编码智能体，同时处理代码库与浏览器 |
 | 交互粒度 | 逐步内省页面结构 | 单条 shell 指令 |
 | 详见 | 本页 | [Playwright CLI](/docs/cli) |
 
 > [!WARNING]
-> Playwright MCP 不是安全边界。代理获得的是真实浏览器控制权，请以最小能力集启动、用 `allowedOrigins` 收窄可访问来源，并在客户端审阅所有进入模型的响应内容。凭证与令牌应放进 `secrets` 参数，而不是写进页面或提示词。
+> Playwright MCP 不是安全边界。智能体获得的是真实浏览器控制权，请以最小能力集启动、用 `allowedOrigins` 收窄可访问来源，并在客户端审阅所有进入模型的响应内容。凭证与令牌应放进 `secrets` 参数，而不是写进页面或提示词。
