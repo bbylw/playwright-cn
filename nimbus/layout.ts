@@ -66,7 +66,7 @@ function footer(): Html {
   return html`
   <footer class="border-t border-border/50 bg-surface-dark/60 relative">
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8 py-14">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-10">
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-10">
         <div class="col-span-2">
           <a href="/" class="flex items-center gap-2.5 mb-4">
             <img src="/favicon.svg" alt="" width="32" height="32" class="w-8 h-8 rounded-lg">
@@ -81,6 +81,7 @@ function footer(): Html {
         ${col("产品", html`${li("/#test", "Playwright Test")}${li("/#cli", "Playwright CLI")}${li("/#mcp", "Playwright MCP")}${li("/#library", "Playwright Library")}`)}
         ${col("文档", html`${li("/docs/intro", "简介")}${li("/docs/installation", "安装")}${li("/docs/locators", "定位器")}${li("/docs/assertions", "断言")}${li("/docs/configuration", "测试配置")}`)}
         ${col("社区", html`${li("https://github.com/microsoft/playwright", "GitHub", true)}${li("https://aka.ms/playwright/discord", "Discord", true)}${li("https://playwright.dev", "官方文档", true)}${li("https://www.npmjs.com/package/playwright", "npm", true)}`)}
+        ${col("贡献者", html`<li><a href="https://github.com/playwrightmachine" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-txt-secondary hover:text-accent text-sm transition-colors"><img src="https://avatars.githubusercontent.com/u/89237858?s=64&amp;v=4" alt="" width="20" height="20" loading="lazy" class="w-5 h-5 rounded-full border border-border">playwrightmachine</a></li>`)}
       </div>
       <div class="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <p class="text-txt-muted text-xs">© 2026 Playwright · 采用 Apache-2.0 许可证</p>
