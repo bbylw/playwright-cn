@@ -25,11 +25,11 @@ function nav(active: "home" | "docs"): Html {
   return html`
   <nav id="siteNav" class="fixed top-0 w-full z-50 nav-blur bg-surface-dark/70 border-b border-border/50">
     <div class="max-w-[1400px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
-      <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="Playwright 中文首页">
+      <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="Playwright 首页">
         <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center shadow-lg shadow-accent/20">
           <span class="text-surface-dark font-display font-bold text-sm">P</span>
         </span>
-        <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright<span class="text-accent">·</span><span class="text-txt-secondary font-medium text-sm align-middle">中文</span></span>
+        <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright</span>
       </a>
       <div class="hidden md:flex items-center gap-6">
         ${link("/#features", "功能")}
@@ -80,9 +80,9 @@ function footer(): Html {
             <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan flex items-center justify-center">
               <span class="text-surface-dark font-display font-bold text-sm">P</span>
             </span>
-            <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright·中文</span>
+            <span class="font-display font-bold text-lg text-txt-primary tracking-tight">Playwright</span>
           </a>
-          <p class="text-txt-secondary text-sm leading-relaxed max-w-xs mb-5">通过单一 API 驱动 Chromium、Firefox 和 WebKit 的 Web 自动化与测试框架。非官方中文社区站点。</p>
+          <p class="text-txt-secondary text-sm leading-relaxed max-w-xs mb-5">通过单一 API 驱动 Chromium、Firefox 和 WebKit 的 Web 自动化与测试框架。非官方站点。</p>
           <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-surface text-xs text-txt-muted">
             <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             由 <span class="text-txt-secondary font-medium">Nimbus + Bun</span> 构建
@@ -93,7 +93,7 @@ function footer(): Html {
         ${col("社区", html`${li("https://github.com/microsoft/playwright", "GitHub", true)}${li("https://aka.ms/playwright/discord", "Discord", true)}${li("https://playwright.dev", "官方文档", true)}${li("https://www.npmjs.com/package/playwright", "npm", true)}`)}
       </div>
       <div class="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <p class="text-txt-muted text-xs">© 2026 Playwright 中文社区 · Playwright 采用 Apache-2.0 许可证</p>
+        <p class="text-txt-muted text-xs">© 2026 Playwright · 采用 Apache-2.0 许可证</p>
         <p class="text-txt-muted text-xs">Chromium 147 · Firefox 149 · WebKit 26.4</p>
       </div>
     </div>
