@@ -1,12 +1,12 @@
 ---
 title: Playwright CLI
-description: 面向编码智能体的浏览器自动化命令行工具，命令式调用比 MCP 更节省上下文。
+description: 面向编码Agent 的浏览器自动化命令行工具，命令式调用比 MCP 更节省上下文。
 section: 工具
 order: 1
 slug: cli
 ---
 
-Playwright CLI（`@playwright/cli`）是为编码智能体设计的浏览器命令行接口。它把浏览器控制拆成短小的子命令，智能体只需执行 `playwright-cli click e15` 这样的指令，不必把大型工具 schema 和完整可访问性树载入上下文，因此比 MCP 更节省 token。
+Playwright CLI（`@playwright/cli`）是为编码Agent 设计的浏览器命令行接口。它把浏览器控制拆成短小的子命令，Agent 只需执行 `playwright-cli click e15` 这样的指令，不必把大型工具 schema 和完整可访问性树载入上下文，因此比 MCP 更节省 token。
 
 ## 安装
 
@@ -23,13 +23,13 @@ bunx playwright cli --help
 
 ## 安装技能（skills）
 
-Claude Code、GitHub Copilot 等智能体会自动读取本地已安装的 skill，智能体据此了解每个命令的用法与参数：
+Claude Code、GitHub Copilot 等Agent 会自动读取本地已安装的 skill，Agent 据此了解每个命令的用法与参数：
 
 ```bash
 playwright-cli install --skills
 ```
 
-没有安装 skill 也能工作 —— 在任务里让智能体先读帮助即可：
+没有安装 skill 也能工作 —— 在任务里让Agent 先读帮助即可：
 
 > 使用 playwright-cli 测试 https://demo.playwright.dev/todomvc 上的「添加待办」流程。
 > 先运行 `playwright-cli --help` 了解可用命令，为成功和失败两种场景分别截图。
@@ -77,7 +77,7 @@ playwright-cli close-all
 playwright-cli kill-all
 ```
 
-配置文件默认保存在内存中，重启浏览器后 Cookie 与本地存储丢失；`--persistent` 会落盘保留。让智能体固定使用某个会话，可设置环境变量：
+配置文件默认保存在内存中，重启浏览器后 Cookie 与本地存储丢失；`--persistent` 会落盘保留。让Agent 固定使用某个会话，可设置环境变量：
 
 ```bash
 PLAYWRIGHT_CLI_SESSION=todo-app claude .
@@ -120,14 +120,14 @@ playwright-cli --raw eval "JSON.stringify(performance.timing)" | jq '.loadEventE
 
 ## 可视化监控
 
-`show` 打开仪表板，列出所有活动会话的实时画面，点击任意会话即可放大并接管鼠标键盘，按 Esc 释放控制权。编码智能体在后台跑自动化时，这是最直接的观察方式：
+`show` 打开仪表板，列出所有活动会话的实时画面，点击任意会话即可放大并接管鼠标键盘，按 Esc 释放控制权。编码Agent 在后台跑自动化时，这是最直接的观察方式：
 
 ```bash
 playwright-cli show
 playwright-cli show --annotate
 ```
 
-`--annotate` 模式专为界面评审设计，可在页面上标注问题并把反馈交回智能体。
+`--annotate` 模式专为界面评审设计，可在页面上标注问题并把反馈交回Agent。
 
 ## 命令速查
 
@@ -152,7 +152,7 @@ playwright-cli show --annotate
 
 | | Playwright CLI | Playwright MCP |
 |---|---|---|
-| 适合 | 高吞吐编码智能体，需在有限上下文中同时处理代码库与浏览器 | 需要持续内省、逐步推理页面结构的智能体循环 |
+| 适合 | 高吞吐编码Agent，需在有限上下文中同时处理代码库与浏览器 | 需要持续内省、逐步推理页面结构的Agent 循环 |
 | token 成本 | 低，命令输出按需裁剪 | 较高，快照随工具响应进入上下文 |
 | 集成方式 | shell 命令 + skills | MCP 工具协议 |
 | 详见 | 本页 | [Playwright MCP](/docs/mcp) |

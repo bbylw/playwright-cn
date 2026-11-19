@@ -51,7 +51,7 @@ write(
   renderDocument(
     shell({
       title: "Playwright 中文 — Web 自动化与测试框架",
-      description: "通过单一 API 驱动 Chromium、Firefox 和 WebKit。Playwright 中文落地页与文档：测试、脚本以及 AI 智能体工具。",
+      description: "通过单一 API 驱动 Chromium、Firefox 和 WebKit。Playwright 中文落地页与文档：测试、脚本以及 AI Agent 工具。",
       path: "/",
       active: "home",
       body: landingPage(),
